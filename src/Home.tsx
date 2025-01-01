@@ -1,4 +1,5 @@
-import {Button, Card, Stack} from "@chakra-ui/react";
+import {Button, Card, SimpleGrid} from "@chakra-ui/react";
+import {IoMdLock} from "react-icons/io";
 
 export default function Home() {
   const roomList = [
@@ -13,56 +14,38 @@ export default function Home() {
       locked: false},
     {name: "4번방",
       code: "#ABDW9280",
-      locked: false},
+      locked: true},
     {name: "5번방",
       code: "#ABDW9280",
       locked: false}
   ];
   return (
       <>
-        <div className="mt-24 text-center">
+        <div className="mt-10 text-center">
           <h1 className="text-3xl font-semibold text-gray-800">Guess It!</h1>
         </div>
 
-        <Button variant="solid" color>버튼</Button>
-        <Stack gap="4" direction="row" wrap="wrap">
-          {roomList.map((value) => (
+        <div className="mt-10 flex flex-col items-center text-center">
+          <SimpleGrid columns={2} gap="4">
+            {roomList.map((value) => (
               <Card.Root width="320px" variant={"elevated"} key={"elevated"}>
                 <Card.Body gap="2">
-                  <Card.Title mb="2">{value.name}</Card.Title>
+                  <Card.Title mb="2">
+                    <div className="flex items-center space-x-2 text-lg">
+                      {value.locked ? <IoMdLock/> : ''} {value.name}
+                    </div>
+                  </Card.Title>
                   <Card.Description>
-                    This is the card body. Lorem ipsum dolor sit amet, consectetur
-                    adipiscing elit.
+                    {value.code}
                   </Card.Description>
                 </Card.Body>
                 <Card.Footer justifyContent="flex-end">
-                  <Button variant="outline">View</Button>
                   <Button>Join</Button>
                 </Card.Footer>
               </Card.Root>
-          ))}
-
-        </Stack>
-
-        <div className="mt-10 flex flex-col items-center text-center">
-          <table className="table-auto border">
-            <tbody>
-              <tr>
-                <th>방 제목</th>
-                <th>방 코드</th>
-                <th>잠금여부</th>
-              </tr>
-              {roomList.map((value) => (
-                <tr>
-                  <td>{value.name}</td>
-                  <td>{value.code}</td>
-                  <td>{value.locked ? '🔒' : '🔓'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            ))}
+          </SimpleGrid>
         </div>
-
       </>
   );
 }
