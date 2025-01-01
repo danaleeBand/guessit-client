@@ -1,5 +1,6 @@
-import {Button, Card, SimpleGrid} from "@chakra-ui/react";
+import {Card, SimpleGrid} from "@chakra-ui/react";
 import {IoMdLock} from "react-icons/io";
+import {Button} from "./components/ui/button.tsx";
 
 export default function Home() {
   const roomList = [
