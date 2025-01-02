@@ -52,11 +52,11 @@ export default function Home() {
         </div>
 
         <Dialog>
-          <DialogTrigger asChild>
-            <div className="mt-5 text-center">
+          <div className="mt-5 text-center">
+            <DialogTrigger asChild>
               <Button variant={"secondary"}><BsDoorOpenFill/> 방 만들기</Button>
-            </div>
-          </DialogTrigger>
+            </DialogTrigger>
+          </div>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>방 만들기</DialogTitle>
@@ -108,7 +108,7 @@ export default function Home() {
                   <Card.Body gap="2">
                     <Card.Title mb="2">
                       <div className="flex items-center space-x-2 text-lg">
-                        {value.locked ? <IoMdLock/> : ''} {value.name}
+                        {value.locked ? <IoMdLock className="mr-1.5" /> : ''} {value.name}
                       </div>
                     </Card.Title>
                     <Card.Description>
