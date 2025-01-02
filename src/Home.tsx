@@ -13,9 +13,27 @@ import {
 import {Label} from "./components/ui/label.tsx";
 import {Input} from "./components/ui/input.tsx";
 import {RadioGroup, RadioGroupItem} from "./components/ui/radio-group.tsx";
-import {useState} from "react";
+import {useState, useEffect} from "react";
+import roomApi from "./apis/roomApi.ts";
 
 export default function Home() {
+  const handleGetUerInfo = async (userId: number) => {
+    await roomApi
+      .createRoom(userId)
+      .then((value) => {
+        console.log(value.data);
+      })
+      .catch(function (e) {
+        console.log("error Msg....", e);
+      })
+      .finally(
+      );
+  };
+
+  useEffect(() => {
+    handleGetUerInfo(1);
+  }, []);
+
   const [isLocked, setIsLocked] = useState(false);
   const roomList = [
     {
