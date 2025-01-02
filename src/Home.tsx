@@ -19,27 +19,27 @@ import roomApi from "./apis/roomApi.ts";
 export default function Home() {
   const defaultRoomList = [
     {
-      name: "같이 연상퀴즈 해요~!",
+      title: "같이 연상퀴즈 해요~!",
       code: "#DFWA2736",
       locked: true
     },
     {
-      name: "연상퀴즈 ㄱㄱ",
+      title: "연상퀴즈 ㄱㄱ",
       code: "#QWER1234",
       locked: false
     },
     {
-      name: "3번방",
+      title: "3번방",
       code: "#ABDW9280",
       locked: false
     },
     {
-      name: "4번방",
+      title: "4번방",
       code: "#SJEI1038",
       locked: true
     },
     {
-      name: "5번방",
+      title: "5번방",
       code: "#ABDW9223",
       locked: false
     }
@@ -70,7 +70,17 @@ export default function Home() {
   const onCreateRoomButton = async () => {
     console.log(JSON.stringify(roomCreateForm));
     await roomApi.createRoom(roomCreateForm)
-        .then((res) => console.log(res.data));
+        .then((res) => {
+          console.log(res.data)
+          setRoomList((prev) => [
+              ...prev,
+            {
+              title: res.data.title,
+              code: res.data.code,
+              locked: res.data.locked
+            }
+          ])
+        });
   }
 
   return (
@@ -136,7 +146,7 @@ export default function Home() {
                   <Card.Body gap="2">
                     <Card.Title mb="2">
                       <div className="flex items-center space-x-2 text-lg">
-                        {value.locked ? <IoMdLock className="mr-1.5" /> : ''} {value.name}
+                        {value.locked ? <IoMdLock className="mr-1.5" /> : ''} {value.title}
                       </div>
                     </Card.Title>
                     <Card.Description>
