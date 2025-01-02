@@ -17,51 +17,61 @@ import {useState, useEffect} from "react";
 import roomApi from "./apis/roomApi.ts";
 
 export default function Home() {
-  const handleGetUerInfo = async (userId: number) => {
-    await roomApi
-      .createRoom(userId)
-      .then((value) => {
-        console.log(value.data);
-      })
-      .catch(function (e) {
-        console.log("error Msg....", e);
-      })
-      .finally(
-      );
-  };
-
-  useEffect(() => {
-    handleGetUerInfo(1);
-  }, []);
-
-  const [isLocked, setIsLocked] = useState(false);
-  const roomList = [
+  const defaultRoomList = [
     {
-        name: "같이 연상퀴즈 해요~!",
-        code: "#DFWA2736",
-        locked: true
+      name: "같이 연상퀴즈 해요~!",
+      code: "#DFWA2736",
+      locked: true
     },
     {
-        name: "연상퀴즈 ㄱㄱ",
-        code: "#QWER1234",
-        locked: false
+      name: "연상퀴즈 ㄱㄱ",
+      code: "#QWER1234",
+      locked: false
     },
     {
-        name: "3번방",
-        code: "#ABDW9280",
-        locked: false
+      name: "3번방",
+      code: "#ABDW9280",
+      locked: false
     },
     {
-        name: "4번방",
-        code: "#SJEI1038",
-        locked: true
+      name: "4번방",
+      code: "#SJEI1038",
+      locked: true
     },
     {
-        name: "5번방",
-        code: "#ABDW9223",
-        locked: false
+      name: "5번방",
+      code: "#ABDW9223",
+      locked: false
     }
   ];
+  const [roomList, setRoomList] = useState(defaultRoomList);
+
+  const [roomCreateForm, setRoomCreateForm] = useState({
+    title: "",
+    locked: false,
+    password: "",
+  });
+
+  const onRoomCreateFormChange = (e) => {
+    const { name, value } = e.target;
+    setRoomCreateForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const onLockedButtonClick = (value) => {
+    setRoomCreateForm((prev) => ({
+      ...prev,
+      ['locked']: value,
+    }));
+  }
+
+  const onCreateRoomButton = async () => {
+    console.log(JSON.stringify(roomCreateForm));
+    await roomApi.createRoom(roomCreateForm)
+        .then((res) => console.log(res.data));
+  }
 
   return (
       <>
@@ -72,7 +82,7 @@ export default function Home() {
         <Dialog>
           <div className="mt-5 text-center">
             <DialogTrigger asChild>
-              <Button variant={"secondary"}><BsDoorOpenFill/> 방 만들기</Button>
+              <Button variant="secondary"><BsDoorOpenFill/> 방 만들기</Button>
             </DialogTrigger>
           </div>
           <DialogContent className="sm:max-w-[425px]">
@@ -84,23 +94,23 @@ export default function Home() {
             </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
+                  <Label htmlFor="title" className="text-right">
                     방 제목
                   </Label>
-                  <Input id="name" className="col-span-3"/>
+                  <Input name="title" className="col-span-3" onChange={onRoomCreateFormChange}/>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="locked" className="text-right">
                     잠금 여부
                   </Label>
-                  <RadioGroup defaultValue="false" id="locked" className="col-span-3">
+                  <RadioGroup defaultValue="false" className="col-span-3">
                     <div className="grid grid-cols-3 items-center">
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem onClick={() => setIsLocked(false)} value="false" id="open"/>
+                        <RadioGroupItem onClick={() => onLockedButtonClick(false)} value="false" id="open"/>
                         <Label htmlFor="open">공개방</Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem onClick={() => setIsLocked(true)} value="true" id="lock"/>
+                        <RadioGroupItem onClick={() => onLockedButtonClick(true)} value="true" id="lock"/>
                         <Label htmlFor="lock">비밀방</Label>
                       </div>
                     </div>
@@ -110,11 +120,11 @@ export default function Home() {
                   <Label htmlFor="password" className="text-right">
                     비밀번호
                   </Label>
-                  <Input id="password" disabled={!isLocked} className="col-span-3"/>
+                  <Input name="password" disabled={!roomCreateForm.locked} className="col-span-3" onChange={onRoomCreateFormChange}/>
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit">만들기</Button>
+                <Button type="submit" onClick={onCreateRoomButton}>만들기</Button>
               </DialogFooter>
           </DialogContent>
         </Dialog>
