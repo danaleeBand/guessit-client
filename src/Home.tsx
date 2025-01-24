@@ -93,18 +93,23 @@ export default function Home() {
                   <Label htmlFor="locked" className="text-right">
                     잠금 여부
                   </Label>
-                  <RadioGroup defaultValue="false" id="locked" className="col-span-3">
-                    <div className="grid grid-cols-3 items-center">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem onClick={() => setIsLocked(false)} value="false" id="open"/>
-                        <Label htmlFor="open">공개방</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem onClick={() => setIsLocked(true)} value="true" id="lock"/>
-                        <Label htmlFor="lock">비밀방</Label>
-                      </div>
-                    </div>
-                  </RadioGroup>
+                    <RadioGroup
+                        defaultValue={isLocked ? "true" : "false"}
+                        id="locked"
+                        className="col-span-3"
+                        onValueChange={(value) => setIsLocked(value === "true")}
+                    >
+                        <div className="grid grid-cols-3 items-center">
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="false" id="open" />
+                                <Label htmlFor="open">공개방</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="true" id="lock" />
+                                <Label htmlFor="lock">비밀방</Label>
+                            </div>
+                        </div>
+                    </RadioGroup>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="password" className="text-right">
