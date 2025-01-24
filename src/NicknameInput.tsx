@@ -1,13 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from './components/ui/button.tsx'
 import { Card, SimpleGrid } from '@chakra-ui/react'
 import { Input } from './components/ui/input.tsx'
+import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar'
+
+const profileImages = ['https://github.com/shadcn.png']
 
 export default function NicknameInput() {
   const [nickname, setNickname] = useState('')
+  const [randomProfileImage, setRandomProfileImage] = useState<string>('')
 
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * profileImages.length)
+    setRandomProfileImage(profileImages[randomIndex])
+  }, [])
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value)
@@ -17,6 +26,7 @@ export default function NicknameInput() {
     e.preventDefault()
     if (nickname) {
       sessionStorage.setItem('nickname', nickname)
+      sessionStorage.setItem('profileImage', randomProfileImage)
       navigate('/home')
     } else {
       alert('닉네임을 입력해주세요!')
@@ -34,18 +44,24 @@ export default function NicknameInput() {
           <Card.Root width="320px" variant={'elevated'}>
             <form onSubmit={handleSubmit}>
               <Card.Body gap="2">
-                <Card.Title mb="2">
-                  <div className="flex items-center space-x-2 text-lg">
-                    <h1>닉네임을 입력하세요</h1>
-                  </div>
-                </Card.Title>
+                <Card.Title mb="2"></Card.Title>
                 <Card.Description>
-                  <Input
-                    type="text"
-                    placeholder="닉네임"
-                    value={nickname}
-                    onChange={handleNicknameChange}
-                  />
+                  {randomProfileImage && (
+                    <div className="mt-6 flex justify-center">
+                      <Avatar>
+                        <AvatarImage src={randomProfileImage} />
+                        <AvatarFallback>미리보기</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  )}
+                  <div className="mt-6">
+                    <Input
+                      type="text"
+                      placeholder="닉네임"
+                      value={nickname}
+                      onChange={handleNicknameChange}
+                    />
+                  </div>
                 </Card.Description>
               </Card.Body>
               <Card.Footer justifyContent="flex-end">
