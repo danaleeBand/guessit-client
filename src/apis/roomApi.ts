@@ -1,7 +1,7 @@
-import axiosClient from './axiosClient';
+import axiosClient from './axiosClient'
 
 const roomApi = {
-  createRoom: (request) => axiosClient.post(`/rooms`, request),
-};
+  createRoom: (userId: number) => axiosClient.get(`/users/${userId}`, {}),
+}
 
-export default roomApi;
+export default roomApi
