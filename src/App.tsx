@@ -9,7 +9,7 @@ import {
 import NicknameInput from './NicknameInput.tsx'
 
 const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
-  const isAuthenticated = sessionStorage.getItem('nickname')
+  const isAuthenticated = sessionStorage.getItem('playerId')
 
   return isAuthenticated ? element : <Navigate to="/input-nickname" />
 }

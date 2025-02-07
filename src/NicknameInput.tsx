@@ -35,14 +35,36 @@ export default function NicknameInput() {
     setNickname(e.target.value)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (nickname) {
-      sessionStorage.setItem('nickname', nickname)
-      sessionStorage.setItem('profileImage', randomProfileImage)
-      navigate('/home')
-    } else {
+    if (!nickname) {
       alert('닉네임을 입력해주세요!')
+      return
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/players', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nickname: nickname,
+          profileUrl: randomProfileImage,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('프로필 생성에 실패했습니다.')
+      }
+
+      const data = await response.json()
+      sessionStorage.setItem('playerId', data.id)
+
+      navigate('/home')
+    } catch (error) {
+      console.error(error)
+      alert('서버 오류로 인해 프로필 생성에 실패했습니다.')
     }
   }
 
