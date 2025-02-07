@@ -5,7 +5,20 @@ import { Card, SimpleGrid } from '@chakra-ui/react'
 import { Input } from './components/ui/input.tsx'
 import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar'
 
-const profileImages = ['https://github.com/shadcn.png']
+const profileImages = [
+  'https://i.postimg.cc/J76717dq/2025-02-07-9-11-10.png',
+  'https://i.postimg.cc/ZKWb0kGh/2025-02-07-9-11-15.png',
+  'https://i.postimg.cc/yY2VZQK3/2025-02-07-9-11-20.png',
+  'https://i.postimg.cc/Z53JF8Y7/2025-02-07-9-11-26.png',
+  'https://i.postimg.cc/prY6LdPB/2025-02-07-9-11-32.png',
+  'https://i.postimg.cc/jqz9XMyJ/2025-02-07-9-11-37.png',
+  'https://i.postimg.cc/WbTyf07Y/2025-02-07-9-11-45.png',
+  'https://i.postimg.cc/6p113gxF/2025-02-07-9-11-52.png',
+  'https://i.postimg.cc/wBy4s26M/2025-02-07-9-11-56.png',
+  'https://i.postimg.cc/Pqg3bDx4/2025-02-07-9-12-02.png',
+  'https://i.postimg.cc/rm5hfpRL/2025-02-07-9-12-07.png',
+  'https://i.postimg.cc/D0FxHK14/2025-02-07-9-12-16.png',
+]
 
 export default function NicknameInput() {
   const [nickname, setNickname] = useState('')
@@ -48,7 +61,7 @@ export default function NicknameInput() {
                 <Card.Description>
                   {randomProfileImage && (
                     <div className="mt-6 flex justify-center">
-                      <Avatar>
+                      <Avatar className="h-16 w-16">
                         <AvatarImage src={randomProfileImage} />
                         <AvatarFallback>미리보기</AvatarFallback>
                       </Avatar>
