@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button } from './components/ui/button.tsx'
+import { Button } from '../components/ui/button.tsx'
 import { Card, SimpleGrid } from '@chakra-ui/react'
-import { Input } from './components/ui/input.tsx'
-import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar'
+import { Input } from '../components/ui/input.tsx'
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '../components/ui/avatar.tsx'
+import playerApi from '../apis/playerApi.ts'
 
 const profileImages = [
   'https://i.postimg.cc/J76717dq/2025-02-07-9-11-10.png',
@@ -20,52 +25,38 @@ const profileImages = [
   'https://i.postimg.cc/D0FxHK14/2025-02-07-9-12-16.png',
 ]
 
-export default function NicknameInput() {
-  const [nickname, setNickname] = useState('')
-  const [randomProfileImage, setRandomProfileImage] = useState<string>('')
-
+export default function Start() {
   const navigate = useNavigate()
+  const [player, setPlayer] = useState({
+    nickname: '',
+    profileUrl: '',
+  })
 
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * profileImages.length)
-    setRandomProfileImage(profileImages[randomIndex])
+    setPlayer((prev) => ({ ...prev, profileUrl: profileImages[randomIndex] }))
   }, [])
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(e.target.value)
+    setPlayer((prev) => ({ ...prev, nickname: e.target.value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!nickname) {
+    if (!player.nickname) {
       alert('닉네임을 입력해주세요!')
       return
     }
-
-    try {
-      const response = await fetch('http://localhost:8080/api/v1/players', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          nickname: nickname,
-          profileUrl: randomProfileImage,
-        }),
+    await playerApi
+      .createPlayer(player)
+      .then((res) => {
+        sessionStorage.setItem('playerId', res.data.id)
+        navigate('/home')
       })
-
-      if (!response.ok) {
-        throw new Error('프로필 생성에 실패했습니다.')
-      }
-
-      const data = await response.json()
-      sessionStorage.setItem('playerId', data.id)
-
-      navigate('/home')
-    } catch (error) {
-      console.error(error)
-      alert('서버 오류로 인해 프로필 생성에 실패했습니다.')
-    }
+      .catch((err) => {
+        console.error(err)
+        alert('서버 오류로 인해 프로필 생성에 실패했습니다.')
+      })
   }
 
   return (
@@ -81,10 +72,10 @@ export default function NicknameInput() {
               <Card.Body gap="2">
                 <Card.Title mb="2"></Card.Title>
                 <Card.Description>
-                  {randomProfileImage && (
+                  {player.profileUrl && (
                     <div className="mt-6 flex justify-center">
                       <Avatar className="h-16 w-16">
-                        <AvatarImage src={randomProfileImage} />
+                        <AvatarImage />
                         <AvatarFallback>미리보기</AvatarFallback>
                       </Avatar>
                     </div>
@@ -93,7 +84,7 @@ export default function NicknameInput() {
                     <Input
                       type="text"
                       placeholder="닉네임"
-                      value={nickname}
+                      value={player.nickname}
                       onChange={handleNicknameChange}
                     />
                   </div>
