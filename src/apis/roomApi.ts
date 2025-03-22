@@ -1,7 +1,8 @@
 import axiosClient from './axiosClient'
+import { RoomRequestDto } from '../types/room.ts'
 
 const roomApi = {
-  createRoom: (userId: number) => axiosClient.get(`/users/${userId}`, {}),
+  createRoom: (request: RoomRequestDto) => axiosClient.post(`/rooms`, request),
 }
 
 export default roomApi

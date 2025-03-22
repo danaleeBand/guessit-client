@@ -1,6 +1,6 @@
 import { Card, SimpleGrid } from '@chakra-ui/react'
 import { IoMdLock } from 'react-icons/io'
-import { Button } from './components/ui/button.tsx'
+import { Button } from '../components/ui/button.tsx'
 import { BsDoorOpenFill } from 'react-icons/bs'
 import {
   Dialog,
@@ -10,57 +10,108 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from './components/ui/dialog.tsx'
-import { Label } from './components/ui/label.tsx'
-import { Input } from './components/ui/input.tsx'
-import { RadioGroup, RadioGroupItem } from './components/ui/radio-group.tsx'
-import { useState, useEffect } from 'react'
-import roomApi from './apis/roomApi.ts'
+} from '../components/ui/dialog.tsx'
+import { Label } from '../components/ui/label.tsx'
+import { Input } from '../components/ui/input.tsx'
+import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group.tsx'
+import { useState } from 'react'
+import roomApi from '../apis/roomApi.ts'
 
 export default function Home() {
-  const handleGetUerInfo = async (userId: number) => {
-    await roomApi
-      .createRoom(userId)
-      .then((value) => {
-        console.log(value.data)
-      })
-      .catch(function (e) {
-        console.log('error Msg....', e)
-      })
-      .finally()
-  }
+  // const handleGetUerInfo = async (userId: number) => {
+  //   await roomApi
+  //     .createRoom(userId)
+  //     .then((value) => {
+  //       console.log(value.data)
+  //     })
+  //     .catch(function (e) {
+  //       console.log('error Msg....', e)
+  //     })
+  //     .finally()
+  // }
+  //
+  // useEffect(() => {
+  //   handleGetUerInfo(1)
+  // }, [])
 
-  useEffect(() => {
-    handleGetUerInfo(1)
-  }, [])
-  const [isLocked, setIsLocked] = useState(false)
-  const roomList = [
+  const defaultRoomList = [
     {
-      name: '같이 연상퀴즈 해요~!',
+      title: '같이 연상퀴즈 해요~!',
       code: '#DFWA2736',
       locked: true,
     },
     {
-      name: '연상퀴즈 ㄱㄱ',
+      title: '연상퀴즈 ㄱㄱ',
       code: '#QWER1234',
       locked: false,
     },
     {
-      name: '3번방',
+      title: '3번방',
       code: '#ABDW9280',
       locked: false,
     },
     {
-      name: '4번방',
+      title: '4번방',
       code: '#SJEI1038',
       locked: true,
     },
     {
-      name: '5번방',
+      title: '5번방',
       code: '#ABDW9223',
       locked: false,
     },
   ]
+
+  const [roomList, setRoomList] = useState(defaultRoomList)
+  const [isLocked, setIsLocked] = useState(false)
+
+  const [room, setRoom] = useState({
+    title: '',
+    locked: false,
+    password: '',
+  })
+
+  const onRoomCreateFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setRoom((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const onLockedButtonClick = (value: boolean) => {
+    setRoom((prev) => ({
+      ...prev,
+      ['locked']: value,
+      password: value ? prev.password : '',
+    }))
+  }
+
+  const onCreateRoomButton = async () => {
+    if (!room.title.trim()) {
+      alert('방 제목을 입력해주세요!')
+      return
+    }
+
+    console.log(JSON.stringify(room))
+
+    await roomApi
+      .createRoom(room)
+      .then((res) => {
+        setRoomList([
+          ...roomList,
+          {
+            title: res.data.title,
+            code: res.data.code,
+            locked: res.data.locked,
+          },
+        ])
+      })
+      .catch((err) => {
+        console.log(err)
+        alert('서버 오류로 인해 방 생성에 실패했습니다.')
+      })
+  }
 
   return (
     <>
@@ -85,10 +136,14 @@ export default function Home() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
+              <Label htmlFor="title" className="text-right">
                 방 제목
               </Label>
-              <Input id="name" className="col-span-3" />
+              <Input
+                name="title"
+                className="col-span-3"
+                onChange={onRoomCreateFormChange}
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="locked" className="text-right">
@@ -102,11 +157,19 @@ export default function Home() {
               >
                 <div className="grid grid-cols-3 items-center">
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="false" id="open" />
+                    <RadioGroupItem
+                      onClick={() => onLockedButtonClick(false)}
+                      value="false"
+                      id="open"
+                    />
                     <Label htmlFor="open">공개방</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="true" id="lock" />
+                    <RadioGroupItem
+                      onClick={() => onLockedButtonClick(true)}
+                      value="true"
+                      id="lock"
+                    />
                     <Label htmlFor="lock">비밀방</Label>
                   </div>
                 </div>
@@ -124,7 +187,9 @@ export default function Home() {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">만들기</Button>
+            <Button type="submit" onClick={onCreateRoomButton}>
+              만들기
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -137,7 +202,7 @@ export default function Home() {
                 <Card.Title mb="2">
                   <div className="flex items-center space-x-2 text-lg">
                     {value.locked ? <IoMdLock className="mr-1.5" /> : ''}{' '}
-                    {value.name}
+                    {value.title}
                   </div>
                 </Card.Title>
                 <Card.Description>{value.code}</Card.Description>

@@ -75,7 +75,7 @@ export default function Start() {
                   {player.profileUrl && (
                     <div className="mt-6 flex justify-center">
                       <Avatar className="h-16 w-16">
-                        <AvatarImage />
+                        <AvatarImage src={player.profileUrl} />
                         <AvatarFallback>미리보기</AvatarFallback>
                       </Avatar>
                     </div>
