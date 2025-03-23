@@ -1,12 +1,12 @@
 import './App.css'
-import Home from './Home.tsx'
+import Home from './pages/Home.tsx'
 import {
   BrowserRouter as Router,
   Navigate,
   Route,
   Routes,
 } from 'react-router-dom'
-import NicknameInput from './NicknameInput.tsx'
+import Start from './pages/Start.tsx'
 
 const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
   const isAuthenticated = sessionStorage.getItem('playerId')
@@ -18,7 +18,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/input-nickname" element={<NicknameInput />} />
+        <Route path="/input-nickname" element={<Start />} />
         <Route path="/" element={<ProtectedRoute element={<Home />} />} />
         <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
       </Routes>
