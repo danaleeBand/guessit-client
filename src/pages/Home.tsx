@@ -62,6 +62,12 @@ export default function Home() {
     },
   ]
 
+  const playerId = sessionStorage.getItem('playerId')
+  if (!playerId) {
+    alert('로그인이 필요합니다!')
+    return
+  }
+
   const [roomList, setRoomList] = useState(defaultRoomList)
   const [isLocked, setIsLocked] = useState(false)
 
@@ -71,7 +77,7 @@ export default function Home() {
     password: '',
   })
 
-  const onRoomCreateFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setRoom((prev) => ({
       ...prev,
@@ -79,7 +85,7 @@ export default function Home() {
     }))
   }
 
-  const onLockedButtonClick = (value: boolean) => {
+  const handleLockStateChange = (value: boolean) => {
     setRoom((prev) => ({
       ...prev,
       ['locked']: value,
@@ -93,10 +99,8 @@ export default function Home() {
       return
     }
 
-    console.log(JSON.stringify(room))
-
     await roomApi
-      .createRoom(room)
+      .createRoom({ ...room, creatorId: parseInt(playerId) })
       .then((res) => {
         setRoomList([
           ...roomList,
@@ -142,7 +146,7 @@ export default function Home() {
               <Input
                 name="title"
                 className="col-span-3"
-                onChange={onRoomCreateFormChange}
+                onChange={handleTitleChange}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -158,7 +162,7 @@ export default function Home() {
                 <div className="grid grid-cols-3 items-center">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem
-                      onClick={() => onLockedButtonClick(false)}
+                      onClick={() => handleLockStateChange(false)}
                       value="false"
                       id="open"
                     />
@@ -166,7 +170,7 @@ export default function Home() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem
-                      onClick={() => onLockedButtonClick(true)}
+                      onClick={() => handleLockStateChange(true)}
                       value="true"
                       id="lock"
                     />
