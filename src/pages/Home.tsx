@@ -67,7 +67,7 @@ export default function Home() {
     }
 
     ws.current.onmessage = (event) => {
-      const message = JSON.parse(event.data)
+      const message = event.data
       console.log('WebSocket received:', message)
 
       if (message.type === 'items') {
