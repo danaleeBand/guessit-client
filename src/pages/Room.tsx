@@ -54,7 +54,7 @@ export default function Room() {
   return (
     <div>
       <div className="mt-10 flex flex-col items-center text-center">
-        <div className="w-full max-w-[600px] px-4 sm:px-6 lg:px-8  mx-auto">
+        <div className="w-full max-w-[600px] px-4 sm:px-6 lg:px-8  mx-auto mt-8">
           <div className="mt-10 flex w-full flex-row justify-between items-center">
             <h1 className="text-3xl font-semibold text-gray-800">
               {defaultRoom.title}
