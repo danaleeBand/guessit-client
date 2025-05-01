@@ -59,7 +59,7 @@ export default function Home() {
   const [items, setItems] = useState<RoomItem[]>([])
 
   useEffect(() => {
-    ws.current = new WebSocket(import.meta.env.VITE_SERVER_WEB_SOCKET_URL)
+    ws.current = new WebSocket(`ws://${import.meta.env.VITE_SERVER_BASE_URL}/websocket`)
 
     ws.current.onopen = () => {
       console.log('WebSocket connected')
