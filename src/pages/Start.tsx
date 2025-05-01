@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button.tsx'
-import { Card, SimpleGrid } from '@chakra-ui/react'
+import { Card } from '@chakra-ui/react'
 import { Input } from '../components/ui/input.tsx'
 import {
   Avatar,
@@ -65,37 +65,37 @@ export default function Start() {
         <h1 className="text-3xl font-semibold text-gray-800">Guess It!</h1>
       </div>
 
-      <div className="mt-10 flex flex-col items-center text-center">
-        <SimpleGrid columns={1} gap="4">
-          <Card.Root width="320px" variant={'elevated'}>
+      <div className="mt-10 flex flex-col items-center text-center px-4">
+        <div className="w-full max-w-sm">
+          <Card.Root className="w-full" variant="elevated">
             <form onSubmit={handleSubmit}>
               <Card.Body gap="2">
-                <Card.Title mb="2"></Card.Title>
-                <Card.Description>
-                  {player.profileUrl && (
-                    <div className="mt-6 flex justify-center">
-                      <Avatar className="h-16 w-16">
-                        <AvatarImage src={player.profileUrl} />
-                        <AvatarFallback>미리보기</AvatarFallback>
-                      </Avatar>
-                    </div>
-                  )}
-                  <div className="mt-6">
-                    <Input
-                      type="text"
-                      placeholder="닉네임"
-                      value={player.nickname}
-                      onChange={handleNicknameChange}
-                    />
+                {player.profileUrl && (
+                  <div className="mt-6 flex justify-center">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={player.profileUrl} />
+                      <AvatarFallback>미리보기</AvatarFallback>
+                    </Avatar>
                   </div>
-                </Card.Description>
+                )}
+                <div className="mt-6">
+                  <Input
+                    type="text"
+                    placeholder="닉네임"
+                    value={player.nickname}
+                    onChange={handleNicknameChange}
+                    className="w-full"
+                  />
+                </div>
               </Card.Body>
-              <Card.Footer justifyContent="flex-end">
-                <Button type="submit">Join</Button>
+              <Card.Footer className="justify-end">
+                <Button type="submit" className="w-full sm:w-auto">
+                  Join
+                </Button>
               </Card.Footer>
             </form>
           </Card.Root>
-        </SimpleGrid>
+        </div>
       </div>
     </>
   )
