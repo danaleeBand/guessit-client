@@ -16,50 +16,26 @@ import { Input } from '../components/ui/input.tsx'
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group.tsx'
 import { useEffect, useRef, useState } from 'react'
 import roomApi from '../apis/roomApi.ts'
+import { useNavigate } from 'react-router-dom'
 
 export default function Home() {
-  const defaultRoomList = [
-    {
-      title: '같이 연상퀴즈 해요~!',
-      code: '#DFWA2736',
-      locked: true,
-    },
-    {
-      title: '연상퀴즈 ㄱㄱ',
-      code: '#QWER1234',
-      locked: false,
-    },
-    {
-      title: '3번방',
-      code: '#ABDW9280',
-      locked: false,
-    },
-    {
-      title: '4번방',
-      code: '#SJEI1038',
-      locked: true,
-    },
-    {
-      title: '5번방',
-      code: '#ABDW9223',
-      locked: false,
-    },
-  ]
-
-  const [roomList, setRoomList] = useState(defaultRoomList)
-
   const ws = useRef<WebSocket | null>(null)
 
   type RoomItem = {
+    id: number
     title: string
     code: string
     locked: boolean
+    playing: boolean
+    playerCount: number
   }
 
-  const [items, setItems] = useState<RoomItem[]>([])
+  const [roomList, setRoomList] = useState<RoomItem[]>([])
 
   useEffect(() => {
-    ws.current = new WebSocket(`ws://${import.meta.env.VITE_SERVER_BASE_URL}/websocket`)
+    ws.current = new WebSocket(
+      `ws://${import.meta.env.VITE_SERVER_BASE_URL}/ws/rooms`,
+    )
 
     ws.current.onopen = () => {
       console.log('WebSocket connected')
@@ -67,11 +43,13 @@ export default function Home() {
     }
 
     ws.current.onmessage = (event) => {
-      const message = event.data
-      console.log('WebSocket received:', message)
+      const rawMessage = event.data
 
-      if (message.type === 'items') {
-        setItems(message.payload)
+      try {
+        const message = JSON.parse(rawMessage)
+        setRoomList(message)
+      } catch (err) {
+        console.error('Failed to parse WebSocket message:', err)
       }
     }
 
@@ -90,7 +68,7 @@ export default function Home() {
     return
   }
 
-  const [isLocked, setIsLocked] = useState(false)
+  const [locked, setIsLocked] = useState(false)
 
   const [room, setRoom] = useState({
     title: '',
@@ -114,28 +92,25 @@ export default function Home() {
     }))
   }
 
+  const navigate = useNavigate()
+
   const onCreateRoomButton = async () => {
     if (!room.title.trim()) {
       alert('방 제목을 입력해주세요!')
       return
     }
 
-    await roomApi
-      .createRoom({ ...room, creatorId: parseInt(playerId) })
-      .then((res) => {
-        setRoomList([
-          ...roomList,
-          {
-            title: res.data.title,
-            code: res.data.code,
-            locked: res.data.locked,
-          },
-        ])
+    try {
+      const res = await roomApi.createRoom({
+        ...room,
+        creatorId: parseInt(playerId),
       })
-      .catch((err) => {
-        console.log(err)
-        alert('서버 오류로 인해 방 생성에 실패했습니다.')
-      })
+      const roomId = res.data.id
+      navigate(`/room/${roomId}`)
+    } catch (err) {
+      console.log(err)
+      alert('서버 오류로 인해 방 생성에 실패했습니다.')
+    }
   }
 
   return (
@@ -174,7 +149,7 @@ export default function Home() {
                 잠금 여부
               </Label>
               <RadioGroup
-                defaultValue={isLocked ? 'true' : 'false'}
+                defaultValue={locked ? 'true' : 'false'}
                 id="locked"
                 className="col-span-3"
                 onValueChange={(value) => setIsLocked(value === 'true')}
@@ -205,8 +180,12 @@ export default function Home() {
               </Label>
               <Input
                 id="password"
-                disabled={!isLocked}
+                disabled={!locked}
                 className="col-span-3"
+                value={room.password}
+                onChange={(e) =>
+                  setRoom((prev) => ({ ...prev, password: e.target.value }))
+                }
               />
             </div>
           </div>
@@ -219,9 +198,16 @@ export default function Home() {
       </Dialog>
 
       <div className="mt-10 flex flex-col items-center text-center">
-        <SimpleGrid columns={2} gap="4">
+        <SimpleGrid columns={[1, 2]} gap="4">
           {roomList.map((value) => (
-            <Card.Root width="320px" variant={'elevated'} key={value.code}>
+            <Card.Root
+              width="320px"
+              variant={'elevated'}
+              key={value.id}
+              _hover={{ boxShadow: value.playing ? 'none' : 'lg' }}
+              style={{ opacity: value.playing ? 0.5 : 1 }}
+              pointerEvents={value.playing ? 'none' : 'auto'}
+            >
               <Card.Body gap="2">
                 <Card.Title mb="2">
                   <div className="flex items-center space-x-2 text-lg">
@@ -231,26 +217,10 @@ export default function Home() {
                 </Card.Title>
                 <Card.Description>{value.code}</Card.Description>
               </Card.Body>
-              <Card.Footer justifyContent="flex-end">
-                <Button>Join</Button>
-              </Card.Footer>
-            </Card.Root>
-          ))}
-        </SimpleGrid>
-
-        <SimpleGrid columns={2} gap="4">
-          {items.map((value) => (
-            <Card.Root width="320px" variant={'elevated'} key={value.code}>
-              <Card.Body gap="2">
-                <Card.Title mb="2">
-                  <div className="flex items-center space-x-2 text-lg">
-                    {value.locked ? <IoMdLock className="mr-1.5" /> : ''}{' '}
-                    {value.title}
-                  </div>
-                </Card.Title>
-                <Card.Description>{value.code}</Card.Description>
-              </Card.Body>
-              <Card.Footer justifyContent="flex-end">
+              <Card.Footer justifyContent="space-between" alignItems="center">
+                <span className="bg-gray-100 text-gray-700 font-semibold text-sm px-2 py-1 rounded-md">
+                  {value.playerCount} / 5
+                </span>
                 <Button>Join</Button>
               </Card.Footer>
             </Card.Root>

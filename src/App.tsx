@@ -22,7 +22,10 @@ function App() {
         <Route path="/input-nickname" element={<Start />} />
         <Route path="/" element={<ProtectedRoute element={<Home />} />} />
         <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
-        <Route path="/room" element={<ProtectedRoute element={<Room />} />} />
+        <Route
+          path="/room/:id"
+          element={<ProtectedRoute element={<Room />} />}
+        />
       </Routes>
     </Router>
   )
