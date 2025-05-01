@@ -14,26 +14,10 @@ import {
 import { Label } from '../components/ui/label.tsx'
 import { Input } from '../components/ui/input.tsx'
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group.tsx'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import roomApi from '../apis/roomApi.ts'
 
 export default function Home() {
-  // const handleGetUerInfo = async (userId: number) => {
-  //   await roomApi
-  //     .createRoom(userId)
-  //     .then((value) => {
-  //       console.log(value.data)
-  //     })
-  //     .catch(function (e) {
-  //       console.log('error Msg....', e)
-  //     })
-  //     .finally()
-  // }
-  //
-  // useEffect(() => {
-  //   handleGetUerInfo(1)
-  // }, [])
-
   const defaultRoomList = [
     {
       title: '같이 연상퀴즈 해요~!',
@@ -62,13 +46,50 @@ export default function Home() {
     },
   ]
 
+  const [roomList, setRoomList] = useState(defaultRoomList)
+
+  const ws = useRef<WebSocket | null>(null)
+
+  type RoomItem = {
+    title: string
+    code: string
+    locked: boolean
+  }
+
+  const [items, setItems] = useState<RoomItem[]>([])
+
+  useEffect(() => {
+    ws.current = new WebSocket(import.meta.env.VITE_SERVER_WEB_SOCKET_URL)
+
+    ws.current.onopen = () => {
+      console.log('WebSocket connected')
+      ws.current?.send(JSON.stringify({ type: 'get_items' }))
+    }
+
+    ws.current.onmessage = (event) => {
+      const message = JSON.parse(event.data)
+      console.log('WebSocket received:', message)
+
+      if (message.type === 'items') {
+        setItems(message.payload)
+      }
+    }
+
+    ws.current.onclose = () => {
+      console.log('WebSocket disconnected')
+    }
+
+    return () => {
+      ws.current?.close()
+    }
+  }, [])
+
   const playerId = sessionStorage.getItem('playerId')
   if (!playerId) {
     alert('로그인이 필요합니다!')
     return
   }
 
-  const [roomList, setRoomList] = useState(defaultRoomList)
   const [isLocked, setIsLocked] = useState(false)
 
   const [room, setRoom] = useState({
@@ -122,7 +143,6 @@ export default function Home() {
       <div className="mt-10 text-center">
         <h1 className="text-3xl font-semibold text-gray-800">Guess It!</h1>
       </div>
-
       <Dialog>
         <div className="mt-5 text-center">
           <DialogTrigger asChild>
@@ -201,6 +221,25 @@ export default function Home() {
       <div className="mt-10 flex flex-col items-center text-center">
         <SimpleGrid columns={2} gap="4">
           {roomList.map((value) => (
+            <Card.Root width="320px" variant={'elevated'} key={value.code}>
+              <Card.Body gap="2">
+                <Card.Title mb="2">
+                  <div className="flex items-center space-x-2 text-lg">
+                    {value.locked ? <IoMdLock className="mr-1.5" /> : ''}{' '}
+                    {value.title}
+                  </div>
+                </Card.Title>
+                <Card.Description>{value.code}</Card.Description>
+              </Card.Body>
+              <Card.Footer justifyContent="flex-end">
+                <Button>Join</Button>
+              </Card.Footer>
+            </Card.Root>
+          ))}
+        </SimpleGrid>
+
+        <SimpleGrid columns={2} gap="4">
+          {items.map((value) => (
             <Card.Root width="320px" variant={'elevated'} key={value.code}>
               <Card.Body gap="2">
                 <Card.Title mb="2">
