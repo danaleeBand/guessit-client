@@ -1,8 +1,16 @@
-import { Card, SimpleGrid } from '@chakra-ui/react'
 import { IoMdLock } from 'react-icons/io'
 import { Button } from '../components/ui/button.tsx'
 import { useEffect, useRef, useState } from 'react'
 import CreateRoomModal from '@/components/CreateRoomModal.tsx'
+import { useNavigate } from 'react-router-dom'
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card.tsx'
+import PasswordModal from '@/components/PasswordModal.tsx'
 
 export default function Home() {
   const ws = useRef<WebSocket | null>(null)
@@ -17,6 +25,10 @@ export default function Home() {
   }
 
   const [roomList, setRoomList] = useState<RoomItem[]>([])
+  const [selectedRoom, setSelectedRoom] = useState<RoomItem | null>(null)
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     ws.current = new WebSocket(
@@ -48,10 +60,21 @@ export default function Home() {
     }
   }, [])
 
-  const playerId = sessionStorage.getItem('playerId')
-  if (!playerId) {
-    alert('로그인이 필요합니다!')
-    return
+  const handleJoinClick = (room: RoomItem) => {
+    if (room.locked) {
+      setSelectedRoom(room)
+      setIsPasswordModalOpen(true)
+    } else {
+      navigate(`/room/${room.id}`)
+    }
+  }
+
+  const handlePasswordSubmit = (password: string) => {
+    if (selectedRoom) {
+      navigate(
+        `/room/${selectedRoom.id}?password=${encodeURIComponent(password)}`,
+      )
+    }
   }
 
   return (
@@ -62,35 +85,42 @@ export default function Home() {
       <CreateRoomModal />
 
       <div className="mt-10 flex flex-col items-center text-center">
-        <SimpleGrid columns={[1, 2]} gap="4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {roomList.map((value) => (
-            <Card.Root
-              width="320px"
-              variant={'elevated'}
+            <Card
               key={value.id}
-              _hover={{ boxShadow: value.playing ? 'none' : 'lg' }}
-              style={{ opacity: value.playing ? 0.5 : 1 }}
-              pointerEvents={value.playing ? 'none' : 'auto'}
+              className={`w-[320px] ${value.playing ? 'opacity-50 pointer-events-none' : 'hover:shadow-lg'}`}
             >
-              <Card.Body gap="2">
-                <Card.Title mb="2">
-                  <div className="flex items-center space-x-2 text-lg">
-                    {value.locked ? <IoMdLock className="mr-1.5" /> : ''}{' '}
-                    {value.title}
+              <CardHeader className="text-left">
+                <CardTitle>
+                  <div className="flex items-center space-x-2">
+                    {value.locked && <IoMdLock className="text-lg" />}
+                    <span>{value.title}</span>
                   </div>
-                </Card.Title>
-                <Card.Description>{value.code}</Card.Description>
-              </Card.Body>
-              <Card.Footer justifyContent="space-between" alignItems="center">
+                </CardTitle>
+              </CardHeader>
+              <CardDescription className="text-left px-6 pb-2">
+                {value.code}
+              </CardDescription>
+              <CardFooter className="flex justify-between items-center">
                 <span className="bg-gray-100 text-gray-700 font-semibold text-sm px-2 py-1 rounded-md">
                   {value.playerCount} / 5
                 </span>
-                <Button>Join</Button>
-              </Card.Footer>
-            </Card.Root>
+                <Button onClick={() => handleJoinClick(value)}>Join</Button>
+              </CardFooter>
+            </Card>
           ))}
-        </SimpleGrid>
+        </div>
       </div>
+
+      {selectedRoom && (
+        <PasswordModal
+          roomId={selectedRoom.id}
+          isOpen={isPasswordModalOpen}
+          onClose={() => setIsPasswordModalOpen(false)}
+          onSubmit={handlePasswordSubmit}
+        />
+      )}
     </>
   )
 }
