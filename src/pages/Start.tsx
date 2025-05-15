@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button.tsx'
-import { Card } from '@chakra-ui/react'
+import { Card, CardContent, CardFooter } from '../components/ui/card.tsx'
 import { Input } from '../components/ui/input.tsx'
 import {
   Avatar,
@@ -41,7 +41,7 @@ export default function Start() {
     setPlayer((prev) => ({ ...prev, nickname: e.target.value }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleClick = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!player.nickname) {
       alert('닉네임을 입력해주세요!')
@@ -60,43 +60,35 @@ export default function Start() {
   }
 
   return (
-    <>
-      <div className="mt-10 text-center">
-        <h1 className="text-3xl font-semibold text-gray-800">Guess It!</h1>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-8">
+      <Card className="w-full max-w-sm sm:max-w-md p-6 shadow-xl">
+        <CardContent className="space-y-4">
+          <h1 className="py-6 text-3xl font-bold text-center">Guessit!</h1>
 
-      <div className="mt-10 flex flex-col items-center text-center px-4">
-        <div className="w-full max-w-sm">
-          <Card.Root className="w-full" variant="elevated">
-            <form onSubmit={handleSubmit}>
-              <Card.Body gap="2">
-                {player.profileUrl && (
-                  <div className="mt-6 flex justify-center">
-                    <Avatar className="h-16 w-16">
-                      <AvatarImage src={player.profileUrl} />
-                      <AvatarFallback>미리보기</AvatarFallback>
-                    </Avatar>
-                  </div>
-                )}
-                <div className="mt-6">
-                  <Input
-                    type="text"
-                    placeholder="닉네임"
-                    value={player.nickname}
-                    onChange={handleNicknameChange}
-                    className="w-full"
-                  />
-                </div>
-              </Card.Body>
-              <Card.Footer className="justify-end">
-                <Button type="submit" className="w-full sm:w-auto">
-                  Join
-                </Button>
-              </Card.Footer>
-            </form>
-          </Card.Root>
-        </div>
-      </div>
-    </>
+          {player.profileUrl && (
+            <div className="mt-6 flex justify-center">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={player.profileUrl} />
+                <AvatarFallback>아바타</AvatarFallback>
+              </Avatar>
+            </div>
+          )}
+          <div className="mt-6">
+            <Input
+              type="text"
+              placeholder="닉네임을 입력해주세요"
+              value={player.nickname}
+              onChange={handleNicknameChange}
+              className="w-full"
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-end">
+          <Button onClick={handleClick} className="w-full sm:w-auto">
+            Join
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
   )
 }

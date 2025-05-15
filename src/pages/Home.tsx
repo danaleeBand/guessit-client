@@ -34,7 +34,7 @@ export default function Home() {
 
   useEffect(() => {
     ws.current = new WebSocket(
-      `ws://${import.meta.env.VITE_SERVER_BASE_URL}/ws/rooms`,
+      `${import.meta.env.VITE_WEB_SOCKET_SERVER_BASE_URL}/ws/rooms`,
     )
 
     ws.current.onopen = () => {
