@@ -1,8 +1,6 @@
 import * as React from 'react'
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 import { cn } from '@/lib/utils'
 
 const Avatar = React.forwardRef<
