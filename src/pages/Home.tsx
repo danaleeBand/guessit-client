@@ -11,8 +11,12 @@ import {
   CardTitle,
 } from '@/components/ui/card.tsx'
 import PasswordModal from '@/components/PasswordModal.tsx'
+import roomApi from '@/apis/roomApi.ts'
+import { useToast } from '@/hooks/use-toast.ts'
 
 export default function Home() {
+  const { toast } = useToast()
+
   const ws = useRef<WebSocket | null>(null)
 
   type RoomItem = {
@@ -60,20 +64,32 @@ export default function Home() {
     }
   }, [])
 
-  const handleJoinClick = (room: RoomItem) => {
+  const handleJoinClick = async (room: RoomItem) => {
+    const playerId = Number(sessionStorage.getItem('playerId'))
+
     if (room.locked) {
       setSelectedRoom(room)
       setIsPasswordModalOpen(true)
     } else {
-      navigate(`/room/${room.id}`)
-    }
-  }
+      try {
+        const res = await roomApi.joinRoom(room.id, { playerId, password: '' })
 
-  const handlePasswordSubmit = (password: string) => {
-    if (selectedRoom) {
-      navigate(
-        `/room/${selectedRoom.id}?password=${encodeURIComponent(password)}`,
-      )
+        const { valid, message } = res.data
+
+        if (valid) {
+          navigate(`/room/${room.id}`)
+        } else {
+          toast({
+            title: message,
+          })
+        }
+      } catch (err) {
+        console.error(err)
+        toast({
+          variant: 'destructive',
+          title: '방 입장 중 오류가 발생했습니다.',
+        })
+      }
     }
   }
 
@@ -118,7 +134,6 @@ export default function Home() {
           roomId={selectedRoom.id}
           isOpen={isPasswordModalOpen}
           onClose={() => setIsPasswordModalOpen(false)}
-          onSubmit={handlePasswordSubmit}
         />
       )}
     </>

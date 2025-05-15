@@ -10,35 +10,44 @@ import { Button } from '../components/ui/button.tsx'
 import { Input } from '../components/ui/input.tsx'
 import { useState } from 'react'
 import roomApi from '@/apis/roomApi.ts'
+import { useToast } from '@/hooks/use-toast.ts'
+import { useNavigate } from 'react-router-dom'
 
 type PasswordModalProps = {
   roomId: number
   isOpen: boolean
   onClose: () => void
-  onSubmit: (password: string) => void
 }
 
 export default function PasswordModal({
   roomId,
   isOpen,
   onClose,
-  onSubmit,
 }: PasswordModalProps) {
+  const { toast } = useToast()
+  const navigate = useNavigate()
+
   const [password, setPassword] = useState('')
 
-  const handleSubmit = async () => {
+  const handleJoinRoom = async () => {
     try {
-      const res = await roomApi.checkPassword(roomId, password)
-      const { valid } = res.data
+      const playerId = Number(sessionStorage.getItem('playerId'))
+      const res = await roomApi.joinRoom(roomId, { playerId, password })
+      const { valid, message } = res.data
 
       if (valid) {
-        onSubmit(password)
+        navigate(`/room/${roomId}`)
       } else {
-        alert('비밀번호가 일치하지 않습니다.')
+        toast({
+          title: message,
+        })
       }
     } catch (err) {
       console.error(err)
-      alert('비밀번호 확인 중 오류가 발생했습니다.')
+      toast({
+        variant: 'destructive',
+        title: '비밀번호 확인 중 오류가 발생했습니다.',
+      })
     }
   }
 
@@ -60,9 +69,9 @@ export default function PasswordModal({
           />
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit}>입장</Button>
+          <Button onClick={handleJoinRoom}>Join</Button>
           <Button variant="ghost" onClick={onClose} className="border">
-            취소
+            Cancel
           </Button>
         </DialogFooter>
       </DialogContent>

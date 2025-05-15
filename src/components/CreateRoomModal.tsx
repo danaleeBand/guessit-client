@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom'
 import roomApi from '../apis/roomApi.ts'
 
 export default function CreateRoomModal() {
-  const playerId = sessionStorage.getItem('playerId')
+  const playerId = Number(sessionStorage.getItem('playerId'))
   const navigate = useNavigate()
   const [locked, setIsLocked] = useState(false)
   const [room, setRoom] = useState({
@@ -52,7 +52,7 @@ export default function CreateRoomModal() {
     try {
       const res = await roomApi.createRoom({
         ...room,
-        creatorId: parseInt(playerId!),
+        creatorId: playerId,
       })
       const roomId = res.data.id
       navigate(`/room/${roomId}`)
