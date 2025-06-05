@@ -11,6 +11,10 @@ import {
   AvatarFallback,
   AvatarImage,
 } from '../components/ui/avatar.tsx'
+import { Toggle } from '@/components/ui/toggle.tsx'
+import { Label } from '@/components/ui/label.tsx'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button.tsx'
 
 const defaultRoom = {
   title: '방 제목',
@@ -51,15 +55,20 @@ const defaultRoom = {
 }
 
 export default function Room() {
+  const [isReady, setIsReady] = useState(false)
+  const isCreator = true
+  const isAllReady = true
   return (
     <div>
-      <div className="mt-10 flex flex-col items-center text-center">
-        <div className="w-full max-w-[600px] px-4 sm:px-6 lg:px-8  mx-auto mt-8">
-          <div className="mt-10 flex w-full flex-row justify-between items-center">
+      <div className="mt-5 flex flex-col items-center text-center">
+        <div className="w-full max-w-[600px] px-4 sm:px-6 lg:px-8  mx-auto">
+          <div className="flex w-full flex-row justify-between items-center">
             <h1 className="text-3xl font-semibold text-gray-800">
               {defaultRoom.title}
             </h1>
-            <Settings />
+            <div hidden={!isCreator}>
+              <Settings />
+            </div>
           </div>
 
           <div className="w-full flex justify-end">
@@ -82,13 +91,34 @@ export default function Room() {
             >
               <ResizablePanel defaultSize={75} className="w-full">
                 <div className="flex h-full items-center justify-center p-6 bg-gray-100">
-                  <div className="grid grid-cols-2 gap-4">
-                    {defaultRoom.quizHints.map((hint, index) => (
-                      <span key={index} className="font-semibold">
-                        {hint}
-                      </span>
-                    ))}
+                  <div>
+                    <Toggle
+                      pressed={isReady}
+                      onPressedChange={setIsReady}
+                      variant="outline"
+                      hidden={isCreator}
+                      className="bg-white data-[state=on]:bg-gray-200 w-24 h-12"
+                    >
+                      <Label className="text-lg font-bold">
+                        {isReady ? '준비완료' : '준비'}
+                      </Label>
+                    </Toggle>
+                    <Button
+                      variant="outline"
+                      disabled={!isAllReady}
+                      hidden={!isCreator}
+                      className="text-lg font-bold h-12 w-24"
+                    >
+                      게임시작
+                    </Button>
                   </div>
+                  {/*<div className="grid grid-cols-2 gap-4">*/}
+                  {/*  {defaultRoom.quizHints.map((hint, index) => (*/}
+                  {/*    <span key={index} className="font-semibold">*/}
+                  {/*      {hint}*/}
+                  {/*    </span>*/}
+                  {/*  ))}*/}
+                  {/*</div>*/}
                 </div>
               </ResizablePanel>
             </ResizablePanelGroup>
