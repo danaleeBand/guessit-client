@@ -41,7 +41,6 @@ export default function Home() {
 
     ws.current.onopen = () => {
       console.log('WebSocket connected')
-      ws.current?.send(JSON.stringify({ type: 'get_items' }))
     }
 
     ws.current.onmessage = (event) => {
