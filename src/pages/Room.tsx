@@ -13,58 +13,82 @@ import {
 } from '../components/ui/avatar.tsx'
 import { Toggle } from '@/components/ui/toggle.tsx'
 import { Label } from '@/components/ui/label.tsx'
-import { useState } from 'react'
+import {useEffect, useMemo, useRef, useState} from 'react'
 import { Button } from '@/components/ui/button.tsx'
+import {useParams} from "react-router-dom";
 
-const defaultRoom = {
-  title: '방 제목',
-  players: [
-    {
-      id: 1,
-      name: '유저1',
-      profileUrl: 'https://i.postimg.cc/J76717dq/2025-02-07-9-11-10.png',
-      score: 2,
-    },
-    {
-      id: 2,
-      name: '유저2',
-      profileUrl: 'https://i.postimg.cc/J76717dq/2025-02-07-9-11-10.png',
-      score: 3,
-    },
-    {
-      id: 3,
-      name: '유저3',
-      profileUrl: 'https://i.postimg.cc/J76717dq/2025-02-07-9-11-10.png',
-      score: 10,
-    },
-    {
-      id: 4,
-      name: '유저4',
-      profileUrl: 'https://i.postimg.cc/J76717dq/2025-02-07-9-11-10.png',
-      score: 0,
-    },
-    {
-      id: 5,
-      name: '유저5',
-      profileUrl: 'https://i.postimg.cc/J76717dq/2025-02-07-9-11-10.png',
-      score: 0,
-    },
-  ],
-  quizAnswerLength: 4,
-  quizHints: ['태양', '노란색', '햄스터', '씨앗'],
+export interface Room {
+  id: number
+  code: string
+  title: string
+  playing: boolean
+  locked: boolean
+  creator: Player
+  players: Player[]
+}
+
+export interface Player {
+  id: number
+  nickname: string
+  isReady: boolean
+  profileUrl: string
 }
 
 export default function Room() {
+  const { id: roomId } = useParams()
+  const [room, setRoom] = useState<Room | null>(null)
   const [isReady, setIsReady] = useState(false)
-  const isCreator = true
-  const isAllReady = true
+  const isCreator = useMemo(() => {
+    return room?.creator?.id.toString() === sessionStorage.getItem('playerId')
+  }, [room])
+  const isAllReady = useMemo(() => {
+    if (!room) return false
+    return room?.players.every(player => player.isReady)
+  }, [room])
+  const ws = useRef<WebSocket | null>(null)
+
+
+  useEffect(() => {
+    ws.current = new WebSocket(
+        `${import.meta.env.VITE_WEB_SOCKET_SERVER_BASE_URL}/ws/rooms/${roomId}`,
+    )
+
+    ws.current.onopen = () => {
+      console.log('WebSocket connected')
+    }
+
+    ws.current.onmessage = (event) => {
+      const rawMessage = event.data
+
+      try {
+        const message = JSON.parse(rawMessage)
+        setRoom(message)
+      } catch (err) {
+        console.error('Failed to parse WebSocket message:', err)
+      }
+    }
+
+    ws.current.onclose = () => {
+      console.log('WebSocket disconnected')
+    }
+
+    return () => {
+      ws.current?.close()
+    }
+  }, [])
+
+  function onReadyClick() {
+    setIsReady(!isReady)
+    ws.current?.send(JSON.stringify({ roomId: roomId, playerId: sessionStorage.getItem('playerId')}))
+  }
+
   return (
     <div>
       <div className="mt-5 flex flex-col items-center text-center">
         <div className="w-full max-w-[600px] px-4 sm:px-6 lg:px-8  mx-auto">
           <div className="flex w-full flex-row justify-between items-center">
             <h1 className="text-3xl font-semibold text-gray-800">
-              {defaultRoom.title}
+              {room?.title}
             </h1>
             <div hidden={!isCreator}>
               <Settings />
@@ -94,7 +118,7 @@ export default function Room() {
                   <div>
                     <Toggle
                       pressed={isReady}
-                      onPressedChange={setIsReady}
+                      onPressedChange={onReadyClick}
                       variant="outline"
                       hidden={isCreator}
                       className="bg-white data-[state=on]:bg-gray-200 w-24 h-12"
@@ -125,11 +149,11 @@ export default function Room() {
           </div>
 
           <div className="w-full flex justify-center items-center my-10">
-            <InputOTP maxLength={defaultRoom.quizAnswerLength}>
+            <InputOTP maxLength={5}>
               <InputOTPGroup>
-                {Array.from({ length: defaultRoom.quizAnswerLength }).map(
+                {Array.from({ length: 5 }).map(
                   (_, index) => (
-                    <InputOTPSlot key={index} index={index} />
+                  <InputOTPSlot key={index} index={index} />
                   ),
                 )}
               </InputOTPGroup>
@@ -139,18 +163,21 @@ export default function Room() {
         </div>
 
         <div className="mt-8 flex justify-center gap-8 flex-wrap">
-          {defaultRoom.players.map((player) => (
+          {room?.players.map((player) => (
             <div
               key={player.id}
               className="flex flex-col items-center space-y-2"
             >
+              <Label>
+                {player.isReady ? 'Ready!' : ''}
+              </Label>
               <Avatar className="bg-gray-200 text-black">
                 <AvatarFallback>{player.id}</AvatarFallback>
                 <AvatarImage src={player.profileUrl} />
               </Avatar>
-              <div className="text-sm">{player.name}</div>
+              <div className="text-sm">{player.nickname}</div>
               <div className="rounded-md border px-2 py-1 text-xs">
-                {player.score}
+                {0}
               </div>
             </div>
           ))}
