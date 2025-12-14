@@ -9,3 +9,12 @@ export interface RoomJoinRequestDto {
   playerId: number
   password: string
 }
+
+export type Room = {
+  id: number
+  title: string
+  code: string
+  locked: boolean
+  playing: boolean
+  playerCount: number
+}
