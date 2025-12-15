@@ -19,7 +19,7 @@ export const useRoomList = () => {
     })
 
     client.publish({
-      destination: '/pub/rooms/list',
+      destination: '/pub/rooms',
       body: JSON.stringify({}),
     })
 
