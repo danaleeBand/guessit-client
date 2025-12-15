@@ -13,11 +13,19 @@ import {
 import PasswordModal from '@/components/PasswordModal.tsx'
 import roomApi from '@/apis/roomApi.ts'
 import { useToast } from '@/hooks/use-toast.ts'
+import {Client} from "@stomp/stompjs";
+import {list} from "postcss";
 
 export default function Home() {
   const { toast } = useToast()
 
   const ws = useRef<WebSocket | null>(null)
+
+  type Player = {
+    id: number
+    nickname: string
+    profileUrl: string
+  }
 
   type RoomItem = {
     id: number
@@ -25,7 +33,7 @@ export default function Home() {
     code: string
     locked: boolean
     playing: boolean
-    playerCount: number
+    players: Player[]
   }
 
   const [roomList, setRoomList] = useState<RoomItem[]>([])
@@ -35,32 +43,29 @@ export default function Home() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    ws.current = new WebSocket(
-      `${import.meta.env.VITE_WEB_SOCKET_SERVER_BASE_URL}/ws/rooms`,
-    )
+    roomApi.getRooms()
+        .then(res => setRoomList(res.data));
+  }, []);
 
-    ws.current.onopen = () => {
-      console.log('WebSocket connected')
-    }
+  useEffect(() => {
+    const client = new Client({
+      brokerURL: `${import.meta.env.VITE_WEB_SOCKET_SERVER_BASE_URL}/ws`,
+      debug: (str) => console.log("[STOMP]", str),
+      onConnect: () => {
+        console.log("STOMP 연결 성공");
+        client.subscribe("/sub/rooms", (message) => {
+          setRoomList(JSON.parse(message.body));
+        });
+      },
+    });
 
-    ws.current.onmessage = (event) => {
-      const rawMessage = event.data
-
-      try {
-        const message = JSON.parse(rawMessage)
-        setRoomList(message)
-      } catch (err) {
-        console.error('Failed to parse WebSocket message:', err)
-      }
-    }
-
-    ws.current.onclose = () => {
-      console.log('WebSocket disconnected')
-    }
+    client.activate();
 
     return () => {
-      ws.current?.close()
-    }
+      client.deactivate().then(() => {
+        console.log("STOMP 연결 종료");
+      });
+    };
   }, [])
 
   const handleJoinClick = async (room: RoomItem) => {
@@ -119,7 +124,7 @@ export default function Home() {
               </CardDescription>
               <CardFooter className="flex justify-between items-center">
                 <span className="bg-gray-100 text-gray-700 font-semibold text-sm px-2 py-1 rounded-md">
-                  {value.playerCount} / 5
+                  {value.players.length} / 5
                 </span>
                 <Button onClick={() => handleJoinClick(value)}>Join</Button>
               </CardFooter>

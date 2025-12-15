@@ -6,6 +6,8 @@ const roomApi = {
     axiosClient.post(`/rooms`, request),
   joinRoom: (roomId: number, request: RoomJoinRequestDto) =>
     axiosClient.post(`/rooms/${roomId}/join`, request),
+  getRooms: () =>
+      axiosClient.get(`/rooms`),
 }
 
 export default roomApi
