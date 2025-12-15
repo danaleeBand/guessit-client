@@ -1,6 +1,6 @@
 import { IoMdLock } from 'react-icons/io'
 import { Button } from '../components/ui/button.tsx'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import CreateRoomModal from '@/components/CreateRoomModal.tsx'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -13,57 +13,20 @@ import {
 import PasswordModal from '@/components/PasswordModal.tsx'
 import roomApi from '@/apis/roomApi.ts'
 import { useToast } from '@/hooks/use-toast.ts'
+import { useRoomList } from '@/hooks/useRoomList.ts'
+import { Room } from '@/types/room.ts'
 
 export default function Home() {
   const { toast } = useToast()
 
-  const ws = useRef<WebSocket | null>(null)
-
-  type RoomItem = {
-    id: number
-    title: string
-    code: string
-    locked: boolean
-    playing: boolean
-    playerCount: number
-  }
-
-  const [roomList, setRoomList] = useState<RoomItem[]>([])
-  const [selectedRoom, setSelectedRoom] = useState<RoomItem | null>(null)
+  const roomList = useRoomList()
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
+  console.log(roomList);
 
   const navigate = useNavigate()
 
-  useEffect(() => {
-    ws.current = new WebSocket(
-      `${import.meta.env.VITE_WEB_SOCKET_SERVER_BASE_URL}/ws/rooms`,
-    )
-
-    ws.current.onopen = () => {
-      console.log('WebSocket connected')
-    }
-
-    ws.current.onmessage = (event) => {
-      const rawMessage = event.data
-
-      try {
-        const message = JSON.parse(rawMessage)
-        setRoomList(message)
-      } catch (err) {
-        console.error('Failed to parse WebSocket message:', err)
-      }
-    }
-
-    ws.current.onclose = () => {
-      console.log('WebSocket disconnected')
-    }
-
-    return () => {
-      ws.current?.close()
-    }
-  }, [])
-
-  const handleJoinClick = async (room: RoomItem) => {
+  const handleJoinClick = async (room: Room) => {
     const playerId = Number(sessionStorage.getItem('playerId'))
 
     if (room.locked) {
