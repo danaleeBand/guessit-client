@@ -8,11 +8,13 @@ import {
 import { Separator } from '../components/ui/separator'
 import { Toggle } from '@/components/ui/toggle.tsx'
 import { Label } from '@/components/ui/label.tsx'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button.tsx'
 import { useParams } from 'react-router-dom'
 import Player from '@/components/Player.tsx'
 import { IoMdLock } from 'react-icons/io'
+import { useRoom } from '@/hooks/useRoom.ts'
+import Loading from '@/pages/Loading.tsx'
 
 export interface Room {
   id: number
@@ -32,9 +34,19 @@ export interface Player {
 }
 
 export default function Room() {
-  const { id: roomId } = useParams()
-  const [room, setRoom] = useState<Room | null>(null)
-  const [isReady, setIsReady] = useState(false)
+  const { id } = useParams<{ id: string }>()
+  const roomId = useMemo<number | null>(() => {
+    if (!id) return null
+    const parsed = Number(id)
+    return Number.isNaN(parsed) ? null : parsed
+  }, [id])
+
+  if (roomId === null) {
+    return <Loading />
+  }
+
+  const room = useRoom(roomId)
+  const [isReady] = useState(false)
   const isCreator = useMemo(() => {
     return room?.creator?.id.toString() === sessionStorage.getItem('playerId')
   }, [room])
@@ -46,46 +58,14 @@ export default function Room() {
       .every((player) => player.isReady)
   }, [room])
 
-  const ws = useRef<WebSocket | null>(null)
-
-  useEffect(() => {
-    ws.current = new WebSocket(
-      `${import.meta.env.VITE_WEB_SOCKET_SERVER_BASE_URL}/ws/rooms/${roomId}`,
-    )
-
-    ws.current.onopen = () => {
-      console.log('WebSocket connected')
-    }
-
-    ws.current.onmessage = (event) => {
-      const rawMessage = event.data
-
-      try {
-        const message = JSON.parse(rawMessage)
-        console.log(message)
-        setRoom(message)
-      } catch (err) {
-        console.error('Failed to parse WebSocket message:', err)
-      }
-    }
-
-    ws.current.onclose = () => {
-      console.log('WebSocket disconnected')
-    }
-
-    return () => {
-      ws.current?.close()
-    }
-  }, [])
-
   function onReadyClick() {
-    setIsReady(!isReady)
-    ws.current?.send(
-      JSON.stringify({
-        roomId: roomId,
-        playerId: sessionStorage.getItem('playerId'),
-      }),
-    )
+    // setIsReady(!isReady)
+    // ws.current?.send(
+    //   JSON.stringify({
+    //     roomId: roomId,
+    //     playerId: sessionStorage.getItem('playerId'),
+    //   }),
+    // )
   }
 
   return (

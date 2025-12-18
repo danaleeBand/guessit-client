@@ -1,3 +1,5 @@
+import { PlayerRequestDto } from '@/types/player.ts'
+
 export interface RoomCreateRequestDto {
   title: string
   locked: boolean
@@ -17,4 +19,14 @@ export type Room = {
   locked: boolean
   playing: boolean
   playerCount: number
+}
+
+export type RoomDetail = {
+  id: number
+  title: string
+  code: string
+  locked: boolean
+  playing: boolean
+  creator: PlayerRequestDto
+  players: PlayerRequestDto[]
 }
