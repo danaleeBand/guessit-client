@@ -22,7 +22,6 @@ export default function Home() {
   const roomList = useRoomList()
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
-  console.log(roomList);
 
   const navigate = useNavigate()
 

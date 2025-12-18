@@ -3,7 +3,7 @@ import { useStompClient } from './useStompClient'
 import { Room } from '@/types/room.ts'
 import roomApi from '@/apis/roomApi.ts'
 
-export const useRoomList = () => {
+export const useRoomList = (): Room[] => {
   const { client, isConnected } = useStompClient()
   const [roomList, setRoomList] = useState<Room[]>([])
 
