@@ -1,5 +1,5 @@
 import { ResizablePanel, ResizablePanelGroup } from '../components/ui/resizable'
-import { Settings } from 'lucide-react'
+import { DoorOpen, Settings } from 'lucide-react'
 import {
   InputOTP,
   InputOTPGroup,
@@ -8,9 +8,9 @@ import {
 import { Separator } from '../components/ui/separator'
 import { Toggle } from '@/components/ui/toggle.tsx'
 import { Label } from '@/components/ui/label.tsx'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button.tsx'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Player from '@/components/Player.tsx'
 import { IoMdLock } from 'react-icons/io'
 import { useRoom } from '@/hooks/useRoom.ts'
@@ -35,13 +35,20 @@ export interface Player {
 }
 
 export default function Room() {
+  const navigate = useNavigate()
+  const hasLeftRef = useRef(false)
+
   const { id } = useParams<{ id: string }>()
+  const { client, isConnected } = useStompClient()
+
+  const playerId = Number(sessionStorage.getItem('playerId'))
   const roomId = useMemo<number | null>(() => {
     if (!id) return null
     const parsed = Number(id)
     return Number.isNaN(parsed) ? null : parsed
   }, [id])
-  if (roomId === null) {
+
+  if (roomId === null || playerId === null) {
     return <Loading />
   }
   const room = useRoom(roomId)
@@ -76,6 +83,35 @@ export default function Room() {
     })
   }
 
+  const handleLeave = () => {
+    if (hasLeftRef.current) return
+    if (!client || !client.active) return
+
+    hasLeftRef.current = true
+
+    console.log('나가기 호출됨?')
+    client.publish({
+      destination: '/pub/rooms/leave',
+      body: JSON.stringify({ roomId, playerId }),
+    })
+  }
+
+  const handleLeaveAndGoHome = () => {
+    handleLeave()
+    setTimeout(() => {
+      navigate('/', { replace: true })
+    }, 50)
+  }
+
+  useEffect(() => {
+    if (!client || !isConnected || roomId === null || playerId === null) return
+
+    client.publish({
+      destination: '/pub/rooms/join',
+      body: JSON.stringify({ roomId, playerId }),
+    })
+  }, [client, roomId, playerId])
+
   return (
     <div>
       <div className="mt-5 flex flex-col items-center text-center">
@@ -88,9 +124,25 @@ export default function Room() {
               </h1>
             </div>
             <div>
-              {isCreator && !room?.playing && (
-                <Settings className="hover:animate-spin" />
-              )}
+              <div className="flex items-center gap-1">
+                {isCreator && !room?.playing && (
+                  <Button
+                    variant="ghost"
+                    className="h-8 w-8 p-1 [&_svg]:w-full [&_svg]:h-full"
+                  >
+                    <Settings className="hover:animate-spin" />
+                  </Button>
+                )}
+
+                <Button
+                  variant="ghost"
+                  className="h-8 w-8 p-1 [&_svg]:w-full [&_svg]:h-full"
+                  onClick={handleLeaveAndGoHome}
+                >
+                  <DoorOpen />
+                </Button>
+              </div>
+
               {room?.playing && (
                 <ResizablePanelGroup
                   direction="vertical"
@@ -159,9 +211,9 @@ export default function Room() {
         </div>
 
         <div className="mt-8 flex justify-center gap-8 flex-wrap">
-          {room?.players.map((player) => (
+          {room?.players.map((player, idx) => (
             <div
-              key={player.id}
+              key={`${room.id}-${player.id}-${idx}`}
               className="flex flex-col items-center space-y-2"
             >
               <Player player={player} creatorId={room?.creator?.id} />
