@@ -52,7 +52,6 @@ export default function Room() {
     return <Loading />
   }
   const room = useRoom(roomId)
-  const playerId = Number(sessionStorage.getItem('playerId'))
   const [ready, setReady] = useState(false)
   const isCreator = useMemo(() => {
     return room?.creator?.id === playerId
@@ -64,8 +63,6 @@ export default function Room() {
       .filter((player) => player.id !== room.creator.id)
       .every((player) => player.ready)
   }, [room])
-
-  const { client, isConnected } = useStompClient()
 
   const onReadyClick = () => {
     const next = !ready
@@ -89,7 +86,6 @@ export default function Room() {
 
     hasLeftRef.current = true
 
-    console.log('나가기 호출됨?')
     client.publish({
       destination: '/pub/rooms/leave',
       body: JSON.stringify({ roomId, playerId }),
@@ -213,7 +209,7 @@ export default function Room() {
         <div className="mt-8 flex justify-center gap-8 flex-wrap">
           {room?.players.map((player, idx) => (
             <div
-              key={`${room.id}-${player.id}-${idx}`}
+              key={`${room?.id}-${player.id}-${idx}`}
               className="flex flex-col items-center space-y-2"
             >
               <Player player={player} creatorId={room?.creator?.id} />
