@@ -7,7 +7,7 @@ const Player = ({ player, creatorId }) => {
     <div className="flex flex-col items-center space-y-1">
       <div className="h-5 w-12 flex items-center justify-center">
         {creatorId === player.id ? <Crown className="size-5" /> : ''}
-        <Label className="items-center">{player.isReady ? 'Ready!' : ''}</Label>
+        <Label className="items-center">{player.ready ? 'Ready!' : ''}</Label>
       </div>
       <Avatar className="bg-gray-200 text-black">
         <AvatarFallback>{player.id}</AvatarFallback>
