@@ -30,7 +30,7 @@ export interface Room {
 export interface Player {
   id: number
   nickname: string
-  isReady: boolean
+  ready: boolean
   profileUrl: string
 }
 
@@ -51,29 +51,36 @@ export default function Room() {
   if (roomId === null || playerId === null) {
     return <Loading />
   }
-
   const room = useRoom(roomId)
-
-  const [isReady] = useState(false)
+  const playerId = Number(sessionStorage.getItem('playerId'))
+  const [ready, setReady] = useState(false)
   const isCreator = useMemo(() => {
-    return room?.creator?.id.toString() === sessionStorage.getItem('playerId')
+    return room?.creator?.id === playerId
   }, [room])
 
   const isAllReady = useMemo(() => {
     if (!room) return false
     return room.players
       .filter((player) => player.id !== room.creator.id)
-      .every((player) => player.isReady)
+      .every((player) => player.ready)
   }, [room])
 
-  function onReadyClick() {
-    // setIsReady(!isReady)
-    // ws.current?.send(
-    //   JSON.stringify({
-    //     roomId: roomId,
-    //     playerId: sessionStorage.getItem('playerId'),
-    //   }),
-    // )
+  const { client, isConnected } = useStompClient()
+
+  const onReadyClick = () => {
+    const next = !ready
+    setReady(next)
+
+    if (!client || !isConnected) return
+
+    client.publish({
+      destination: '/pub/rooms/ready',
+      body: JSON.stringify({
+        roomId: roomId,
+        playerId: playerId,
+        ready: next,
+      }),
+    })
   }
 
   const handleLeave = () => {
@@ -160,14 +167,14 @@ export default function Room() {
                 <div className="flex h-full items-center justify-center p-6 bg-gray-100">
                   <div>
                     <Toggle
-                      pressed={isReady}
+                      pressed={ready}
                       onPressedChange={onReadyClick}
                       variant="outline"
                       hidden={isCreator}
                       className="bg-white data-[state=on]:bg-gray-200 w-24 h-12"
                     >
                       <Label className="text-lg font-bold">
-                        {isReady ? '준비완료' : '준비'}
+                        {ready ? '준비완료' : '준비'}
                       </Label>
                     </Toggle>
                     <Button
