@@ -2,6 +2,7 @@ import { Label } from '@/components/ui/label.tsx'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx'
 import { Crown } from 'lucide-react'
 import { Player } from '@/types/player.ts'
+import { Badge } from '@/components/ui/badge.tsx'
 
 interface PlayerProps {
   player: Player
@@ -28,7 +29,9 @@ const PlayerProfile = ({ player, creatorId, playerId }: PlayerProps) => {
         <AvatarImage src={player.profileUrl} />
       </Avatar>
       <div className="text-sm">{player.nickname}</div>
-      <div className="rounded-md border px-2 py-1 text-xs">{0}</div>
+      <Badge variant="outline" className="text-xs w-12 justify-center">
+        {player.score || '-'}
+      </Badge>
     </div>
   )
 }

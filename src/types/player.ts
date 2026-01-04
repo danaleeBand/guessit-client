@@ -3,6 +3,7 @@ export interface Player {
   nickname: string
   ready: boolean
   profileUrl: string
+  score: number
 }
 
 export interface PlayerRequestDto {
