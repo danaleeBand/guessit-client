@@ -11,11 +11,12 @@ import { Label } from '@/components/ui/label.tsx'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button.tsx'
 import { useNavigate, useParams } from 'react-router-dom'
-import Player from '@/components/Player.tsx'
+import PlayerProfile from '@/components/PlayerProfile.tsx'
 import { IoMdLock } from 'react-icons/io'
 import { useRoom } from '@/hooks/useRoom.ts'
 import Loading from '@/pages/Loading.tsx'
 import { useStompClient } from '@/hooks/useStompClient.ts'
+import { Player } from '@/types/player.ts'
 
 export interface Room {
   id: number
@@ -25,13 +26,6 @@ export interface Room {
   locked: boolean
   creator: Player
   players: Player[]
-}
-
-export interface Player {
-  id: number
-  nickname: string
-  ready: boolean
-  profileUrl: string
 }
 
 export default function Room() {
@@ -212,7 +206,7 @@ export default function Room() {
               key={`${room?.id}-${player.id}-${idx}`}
               className="flex flex-col items-center space-y-2"
             >
-              <Player player={player} creatorId={room?.creator?.id} />
+              <PlayerProfile player={player} creatorId={room?.creator?.id} />
             </div>
           ))}
         </div>

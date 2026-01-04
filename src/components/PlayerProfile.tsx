@@ -1,8 +1,14 @@
 import { Label } from '@/components/ui/label.tsx'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx'
 import { Crown } from 'lucide-react'
+import { Player } from '@/types/player.ts'
 
-const Player = ({ player, creatorId }) => {
+interface PlayerProps {
+  player: Player
+  creatorId: number
+}
+
+const PlayerProfile = ({ player, creatorId }: PlayerProps) => {
   return (
     <div className="flex flex-col items-center space-y-1">
       <div className="h-5 w-12 flex items-center justify-center">
@@ -19,4 +25,4 @@ const Player = ({ player, creatorId }) => {
   )
 }
 
-export default Player
+export default PlayerProfile
