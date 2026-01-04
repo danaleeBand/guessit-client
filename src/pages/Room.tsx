@@ -6,8 +6,6 @@ import {
   InputOTPSlot,
 } from '../components/ui/input-otp'
 import { Separator } from '../components/ui/separator'
-import { Toggle } from '@/components/ui/toggle.tsx'
-import { Label } from '@/components/ui/label.tsx'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button.tsx'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -17,6 +15,7 @@ import { useRoom } from '@/hooks/useRoom.ts'
 import Loading from '@/pages/Loading.tsx'
 import { useStompClient } from '@/hooks/useStompClient.ts'
 import { Player } from '@/types/player.ts'
+import Board from '@/components/Board.tsx'
 
 export interface Room {
   id: number
@@ -34,6 +33,7 @@ export default function Room() {
 
   const { id } = useParams<{ id: string }>()
   const { client, isConnected } = useStompClient()
+  const [countdown, setCountdown] = useState<number | null>(null)
 
   const playerId = Number(sessionStorage.getItem('playerId'))
   const roomId = useMemo<number | null>(() => {
@@ -74,6 +74,10 @@ export default function Room() {
     })
   }
 
+  const startGame = () => {
+    setCountdown(5)
+  }
+
   const handleLeave = () => {
     if (hasLeftRef.current) return
     if (!client || !client.active) return
@@ -101,6 +105,22 @@ export default function Room() {
       body: JSON.stringify({ roomId, playerId }),
     })
   }, [client, roomId, playerId])
+
+  useEffect(() => {
+    if (countdown === null) return
+    if (countdown === 0) {
+      const timer = setTimeout(() => {
+        setCountdown(null)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown(countdown - 1)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [countdown])
 
   return (
     <div>
@@ -150,43 +170,14 @@ export default function Room() {
           </div>
 
           <div className="w-full">
-            <ResizablePanelGroup
-              direction="vertical"
-              className="min-h-[300px] w-full rounded-lg mx-auto"
-            >
-              <ResizablePanel defaultSize={75} className="w-full">
-                <div className="flex h-full items-center justify-center p-6 bg-gray-100">
-                  <div>
-                    <Toggle
-                      pressed={ready}
-                      onPressedChange={onReadyClick}
-                      variant="outline"
-                      hidden={isCreator}
-                      className="bg-white data-[state=on]:bg-gray-200 w-24 h-12"
-                    >
-                      <Label className="text-lg font-bold">
-                        {ready ? '준비완료' : '준비'}
-                      </Label>
-                    </Toggle>
-                    <Button
-                      variant="outline"
-                      disabled={!isAllReady}
-                      hidden={!isCreator}
-                      className="text-lg font-bold h-12 w-24"
-                    >
-                      게임시작
-                    </Button>
-                  </div>
-                  {/*<div className="grid grid-cols-2 gap-4">*/}
-                  {/*  {defaultRoom.quizHints.map((hint, index) => (*/}
-                  {/*    <span key={index} className="font-semibold">*/}
-                  {/*      {hint}*/}
-                  {/*    </span>*/}
-                  {/*  ))}*/}
-                  {/*</div>*/}
-                </div>
-              </ResizablePanel>
-            </ResizablePanelGroup>
+            <Board
+              countdown={countdown}
+              ready={ready}
+              isCreator={isCreator}
+              isAllReady={isAllReady}
+              onReadyClick={onReadyClick}
+              onStartGame={startGame}
+            />
           </div>
 
           <div className="w-full flex justify-center items-center my-10">
