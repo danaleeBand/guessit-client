@@ -12,7 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import PlayerProfile from '@/components/PlayerProfile.tsx'
 import { IoMdLock } from 'react-icons/io'
 import { useRoom } from '@/hooks/useRoom.ts'
-import Loading from '@/pages/Loading.tsx'
+import NotFound from '@/pages/NotFound.tsx'
 import { useStompClient } from '@/hooks/useStompClient.ts'
 import { Player } from '@/types/player.ts'
 import Board from '@/components/Board.tsx'
@@ -34,6 +34,7 @@ export default function Room() {
   const { id } = useParams<{ id: string }>()
   const { client, isConnected } = useStompClient()
   const [countdown, setCountdown] = useState<number | null>(null)
+  const [ready, setReady] = useState(false)
 
   const playerId = Number(sessionStorage.getItem('playerId'))
   const roomId = useMemo<number | null>(() => {
@@ -42,11 +43,8 @@ export default function Room() {
     return Number.isNaN(parsed) ? null : parsed
   }, [id])
 
-  if (roomId === null || playerId === null) {
-    return <Loading />
-  }
-  const room = useRoom(roomId)
-  const [ready, setReady] = useState(false)
+  const { room, isNotFound } = useRoom(roomId ?? 0)
+
   const isCreator = useMemo(() => {
     return room?.creator?.id === playerId
   }, [room])
@@ -121,6 +119,10 @@ export default function Room() {
 
     return () => clearTimeout(timer)
   }, [countdown])
+
+  if (roomId === null || playerId === null || isNotFound) {
+    return <NotFound />
+  }
 
   return (
     <div>

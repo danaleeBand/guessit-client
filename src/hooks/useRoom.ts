@@ -3,17 +3,22 @@ import { useEffect, useState } from 'react'
 import { RoomDetail } from '@/types/room.ts'
 import roomApi from '@/apis/roomApi.ts'
 
-export const useRoom = (roomId: number): RoomDetail | undefined => {
+export const useRoom = (
+  roomId: number,
+): { room: RoomDetail | undefined; isNotFound: boolean } => {
   const { client, isConnected } = useStompClient()
   const [room, setRoom] = useState<RoomDetail>()
+  const [isNotFound, setIsNotFound] = useState(false)
 
   useEffect(() => {
     const fetchInitialRooms = async () => {
       try {
         const res = await roomApi.getRoom(roomId)
         setRoom(res.data)
+        setIsNotFound(false)
       } catch (err) {
         console.error('Failed to fetch initial room:', err)
+        setIsNotFound(true)
       }
     }
 
@@ -37,5 +42,5 @@ export const useRoom = (roomId: number): RoomDetail | undefined => {
     }
   }, [client, isConnected, roomId])
 
-  return room
+  return { room, isNotFound }
 }

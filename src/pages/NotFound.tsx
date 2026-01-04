@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/empty.tsx'
 import { AlertCircle } from 'lucide-react'
 
-const Loading = () => {
+const NotFound = () => {
   return (
     <Empty className="w-full">
       <EmptyHeader>
@@ -34,4 +34,4 @@ const Loading = () => {
     </Empty>
   )
 }
-export default Loading
+export default NotFound
