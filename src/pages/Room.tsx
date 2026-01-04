@@ -1,5 +1,5 @@
 import { ResizablePanel, ResizablePanelGroup } from '../components/ui/resizable'
-import { DoorOpen, Settings } from 'lucide-react'
+import { DoorClosed, DoorOpen, Settings } from 'lucide-react'
 import {
   InputOTP,
   InputOTPGroup,
@@ -126,10 +126,11 @@ export default function Room() {
 
                 <Button
                   variant="ghost"
-                  className="h-8 w-8 p-1 [&_svg]:w-full [&_svg]:h-full"
+                  className="group h-8 w-8 p-1 [&_svg]:w-full [&_svg]:h-full"
                   onClick={handleLeaveAndGoHome}
                 >
-                  <DoorOpen />
+                  <DoorClosed className="group-hover:hidden" />
+                  <DoorOpen className="hidden group-hover:block" />
                 </Button>
               </div>
 
