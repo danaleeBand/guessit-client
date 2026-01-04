@@ -118,9 +118,9 @@ export default function Room() {
                 {isCreator && !room?.playing && (
                   <Button
                     variant="ghost"
-                    className="h-8 w-8 p-1 [&_svg]:w-full [&_svg]:h-full"
+                    className="group h-8 w-8 p-1 [&_svg]:w-full [&_svg]:h-full"
                   >
-                    <Settings className="hover:animate-spin" />
+                    <Settings className="group-hover:animate-spin-slow inline-block" />
                   </Button>
                 )}
 
