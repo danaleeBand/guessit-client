@@ -206,7 +206,11 @@ export default function Room() {
               key={`${room?.id}-${player.id}-${idx}`}
               className="flex flex-col items-center space-y-2"
             >
-              <PlayerProfile player={player} creatorId={room?.creator?.id} />
+              <PlayerProfile
+                player={player}
+                creatorId={room?.creator?.id}
+                playerId={playerId}
+              />
             </div>
           ))}
         </div>
