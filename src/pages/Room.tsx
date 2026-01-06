@@ -16,6 +16,8 @@ import NotFound from '@/pages/NotFound.tsx'
 import { useStompClient } from '@/hooks/useStompClient.ts'
 import { Player } from '@/types/player.ts'
 import Board from '@/components/Board.tsx'
+import { useCountdown } from '@/hooks/useCountdown.ts'
+import { useGameState } from '@/hooks/useGameState.ts'
 
 export interface Room {
   id: number
@@ -33,7 +35,6 @@ export default function Room() {
 
   const { id } = useParams<{ id: string }>()
   const { client, isConnected } = useStompClient()
-  const [countdown, setCountdown] = useState<number | null>(null)
   const [ready, setReady] = useState(false)
 
   const playerId = Number(sessionStorage.getItem('playerId'))
@@ -44,6 +45,8 @@ export default function Room() {
   }, [id])
 
   const { room, isNotFound } = useRoom(roomId ?? 0)
+  const { countdown } = useCountdown(roomId ?? 0)
+  const { gameState } = useGameState(roomId ?? 0)
 
   const isCreator = useMemo(() => {
     return room?.creator?.id === playerId
@@ -72,10 +75,6 @@ export default function Room() {
     })
   }
 
-  const startGame = () => {
-    setCountdown(5)
-  }
-
   const handleLeave = () => {
     if (hasLeftRef.current) return
     if (!client || !client.active) return
@@ -95,6 +94,15 @@ export default function Room() {
     }, 50)
   }
 
+  const startGame = () => {
+    if (hasLeftRef.current) return
+    if (!client || !client.active) return
+
+    client.publish({
+      destination: `/pub/rooms/${roomId}/start`,
+    })
+  }
+
   useEffect(() => {
     if (!client || !isConnected || roomId === null || playerId === null) return
 
@@ -103,22 +111,6 @@ export default function Room() {
       body: JSON.stringify({ roomId, playerId }),
     })
   }, [client, roomId, playerId])
-
-  useEffect(() => {
-    if (countdown === null) return
-    if (countdown === 0) {
-      const timer = setTimeout(() => {
-        setCountdown(null)
-      }, 1000)
-      return () => clearTimeout(timer)
-    }
-
-    const timer = setTimeout(() => {
-      setCountdown(countdown - 1)
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [countdown])
 
   if (roomId === null || playerId === null || isNotFound) {
     return <NotFound />
@@ -170,7 +162,8 @@ export default function Room() {
               )}
             </div>
           </div>
-
+          상태 : {gameState}
+          카운트 : {countdown}
           <div className="w-full">
             <Board
               countdown={countdown}
@@ -179,9 +172,9 @@ export default function Room() {
               isAllReady={isAllReady}
               onReadyClick={onReadyClick}
               onStartGame={startGame}
+              gameState={gameState}
             />
           </div>
-
           <div className="w-full flex justify-center items-center my-10">
             <InputOTP maxLength={5} disabled={!room?.playing}>
               <InputOTPGroup>
