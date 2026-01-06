@@ -162,8 +162,6 @@ export default function Room() {
               )}
             </div>
           </div>
-          상태 : {gameState}
-          카운트 : {countdown}
           <div className="w-full">
             <Board
               countdown={countdown}
