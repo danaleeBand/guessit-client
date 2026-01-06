@@ -18,7 +18,6 @@ export const useGameState = (
           const receivedState = message.body
           if (Object.values(GameState).includes(receivedState as GameState)) {
             setGameState(receivedState as GameState)
-            console.log(receivedState)
           } else {
             console.error('Invalid game state received:', receivedState)
           }

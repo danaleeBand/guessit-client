@@ -16,7 +16,6 @@ export const useCountdown = (
         try {
           const countdown = Number(message.body)
           setCountdown(countdown)
-          console.log(countdown)
         } catch (err) {
           console.error('Failed to get countdown:', err)
         }
