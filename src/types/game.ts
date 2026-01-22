@@ -1,7 +1,8 @@
 export enum GameState {
   WAITING = 'WAITING',
   COUNTDOWN = 'COUNTDOWN',
-  IN_PROGRESS = 'IN_PROGRESS',
+  HINT = 'HINT',
+  SCORING = 'SCORING',
   FINISHED = 'FINISHED',
 }
 
