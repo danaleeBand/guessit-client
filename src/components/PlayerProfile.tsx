@@ -8,19 +8,28 @@ interface PlayerProps {
   player: Player
   creatorId: number
   playerId: number
+  romeState: boolean | undefined
 }
 
-const PlayerProfile = ({ player, creatorId, playerId }: PlayerProps) => {
+const PlayerProfile = ({
+  player,
+  creatorId,
+  playerId,
+  romeState,
+}: PlayerProps) => {
   const isMe = player.id === playerId
 
   return (
     <div className="flex flex-col items-center space-y-1">
       <div className="h-5 w-12 flex items-center justify-center">
-        {creatorId === player.id ? (
-          <Crown className="size-5" />
-        ) : (
-          <Label className="items-center">{player.ready ? 'Ready!' : ''}</Label>
-        )}
+        {!romeState &&
+          (creatorId === player.id ? (
+            <Crown className="size-5" />
+          ) : (
+            <Label className="items-center">
+              {player.ready ? 'Ready!' : ''}
+            </Label>
+          ))}
       </div>
       <Avatar
         className={`text-black w-12 h-12 ${isMe ? 'border-2 border-dashed border-black bg-transparent' : 'bg-gray-200'}`}

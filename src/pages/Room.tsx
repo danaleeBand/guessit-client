@@ -1,4 +1,3 @@
-import { ResizablePanel, ResizablePanelGroup } from '../components/ui/resizable'
 import { DoorClosed, DoorOpen, Settings } from 'lucide-react'
 import {
   InputOTP,
@@ -14,20 +13,11 @@ import { IoMdLock } from 'react-icons/io'
 import { useRoom } from '@/hooks/useRoom.ts'
 import NotFound from '@/pages/NotFound.tsx'
 import { useStompClient } from '@/hooks/useStompClient.ts'
-import { Player } from '@/types/player.ts'
 import Board from '@/components/Board.tsx'
 import { useCountdown } from '@/hooks/useCountdown.ts'
 import { useGameState } from '@/hooks/useGameState.ts'
-
-export interface Room {
-  id: number
-  code: string
-  title: string
-  playing: boolean
-  locked: boolean
-  creator: Player
-  players: Player[]
-}
+import { useHint } from '@/hooks/useHint.ts'
+import Box from '@/components/Box.tsx'
 
 export default function Room() {
   const navigate = useNavigate()
@@ -47,6 +37,7 @@ export default function Room() {
   const { room, isNotFound } = useRoom(roomId ?? 0)
   const { countdown } = useCountdown(roomId ?? 0)
   const { gameState } = useGameState(roomId ?? 0)
+  const { hintData } = useHint(roomId ?? 0)
 
   const isCreator = useMemo(() => {
     return room?.creator?.id === playerId
@@ -147,22 +138,17 @@ export default function Room() {
                   <DoorOpen className="hidden group-hover:block" />
                 </Button>
               </div>
-
-              {room?.playing && (
-                <ResizablePanelGroup
-                  direction="vertical"
-                  className="min-h-[50px] max-w-min rounded-lg border"
-                >
-                  <ResizablePanel defaultSize={75}>
-                    <div className="flex h-full items-center justify-center p-6">
-                      <span className="font-semibold">1/10</span>
-                    </div>
-                  </ResizablePanel>
-                </ResizablePanelGroup>
-              )}
             </div>
           </div>
           <div className="w-full">
+            <div className="flex justify-end mb-3">
+              <Box className="px-3 py-1 w-20 text-center text-lg font-bold">
+                {room?.playing && hintData?.quizOrder
+                  ? `${hintData?.quizOrder} / 10`
+                  : '...'}
+              </Box>
+            </div>
+
             <Board
               countdown={countdown}
               ready={ready}
@@ -171,12 +157,20 @@ export default function Room() {
               onReadyClick={onReadyClick}
               onStartGame={startGame}
               gameState={gameState}
+              hints={hintData?.hints}
+              romeState={room?.playing}
             />
           </div>
+          게임 상태 : {gameState}
           <div className="w-full flex justify-center items-center my-10">
-            <InputOTP maxLength={5} disabled={!room?.playing}>
+            <InputOTP
+              maxLength={hintData?.answerLength ? hintData.answerLength : 5}
+              disabled={!room?.playing}
+            >
               <InputOTPGroup>
-                {Array.from({ length: 5 }).map((_, index) => (
+                {Array.from({
+                  length: hintData?.answerLength ? hintData.answerLength : 5,
+                }).map((_, index) => (
                   <InputOTPSlot key={index} index={index} />
                 ))}
               </InputOTPGroup>
@@ -195,6 +189,7 @@ export default function Room() {
                 player={player}
                 creatorId={room?.creator?.id}
                 playerId={playerId}
+                romeState={room?.playing}
               />
             </div>
           ))}

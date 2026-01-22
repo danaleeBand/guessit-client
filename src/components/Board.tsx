@@ -1,8 +1,6 @@
-import { Card } from '@/components/ui/card'
-import { Toggle } from '@/components/ui/toggle'
-import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { GameState } from '@/types/game.ts'
+import Box from '@/components/Box.tsx'
 
 interface BoardProps {
   countdown: number | undefined
@@ -12,6 +10,8 @@ interface BoardProps {
   onReadyClick: () => void
   onStartGame: () => void
   gameState: GameState | undefined
+  hints: string[] | undefined
+  romeState: boolean | undefined
 }
 
 const Board = ({
@@ -22,9 +22,11 @@ const Board = ({
   onReadyClick,
   onStartGame,
   gameState,
+  hints,
+  romeState,
 }: BoardProps) => {
   return (
-    <Card className="min-h-[300px] w-full rounded-lg mx-auto overflow-hidden shadow-none">
+    <Box className="min-h-[300px] w-full rounded-lg mx-auto overflow-hidden shadow-none">
       <div className="relative flex h-full min-h-[300px] items-center justify-center p-6 bg-gray-100">
         {gameState === GameState.COUNTDOWN && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-10 backdrop-blur-sm">
@@ -37,31 +39,43 @@ const Board = ({
           </div>
         )}
 
-        <div>
-          <Toggle
-            pressed={ready}
-            onPressedChange={onReadyClick}
-            variant="outline"
-            hidden={isCreator}
-            className="bg-white data-[state=on]:bg-gray-200 w-24 h-12"
-          >
-            <Label className="text-lg font-bold">
-              {ready ? '준비완료' : '준비'}
-            </Label>
-          </Toggle>
+        {!romeState && (
+          <div>
+            <Button
+              variant="outline"
+              onClick={onReadyClick}
+              hidden={isCreator}
+              className="w-24 h-12 text-lg font-bold"
+            >
+              {ready ? '준비 취소' : '준비'}
+            </Button>
 
-          <Button
-            variant="outline"
-            disabled={!isAllReady}
-            hidden={!isCreator}
-            className="text-lg font-bold h-12 w-24"
-            onClick={onStartGame}
-          >
-            게임시작
-          </Button>
-        </div>
+            <Button
+              variant="outline"
+              disabled={!isAllReady}
+              hidden={!isCreator}
+              className="text-lg font-bold h-12 w-24"
+              onClick={onStartGame}
+            >
+              게임시작
+            </Button>
+          </div>
+        )}
+
+        {gameState === GameState.HINT && hints && (
+          <div className="w-full grid grid-cols-2 gap-3">
+            {hints.map((hint, index) => (
+              <Box
+                key={`hint-${index}`}
+                className="p-4 animate-in fade-in zoom-in-50 duration-500"
+              >
+                <div className="text-base font-medium">{hint}</div>
+              </Box>
+            ))}
+          </div>
+        )}
       </div>
-    </Card>
+    </Box>
   )
 }
 
