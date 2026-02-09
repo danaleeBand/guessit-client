@@ -12,7 +12,7 @@ export const useHint = (
     if (!client || !isConnected) return
 
     const subscription = client.subscribe(
-      `/sub/rooms/${roomId}/hint`,
+      `/sub/rooms/${roomId}/game/hint`,
       (message) => {
         try {
           const newHint: Hint = JSON.parse(message.body)

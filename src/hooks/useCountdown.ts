@@ -11,7 +11,7 @@ export const useCountdown = (
     if (!client || !isConnected) return
 
     const subscription = client.subscribe(
-      `/sub/rooms/${roomId}/countdown`,
+      `/sub/rooms/${roomId}/game/countdown`,
       (message) => {
         try {
           const countdown = Number(message.body)

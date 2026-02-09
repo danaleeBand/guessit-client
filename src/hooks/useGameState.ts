@@ -12,7 +12,7 @@ export const useGameState = (
     if (!client || !isConnected) return
 
     const subscription = client.subscribe(
-      `/sub/rooms/${roomId}/game-state`,
+      `/sub/rooms/${roomId}/game/state`,
       (message) => {
         try {
           const receivedState = message.body

@@ -18,6 +18,8 @@ import { useCountdown } from '@/hooks/useCountdown.ts'
 import { useGameState } from '@/hooks/useGameState.ts'
 import { useHint } from '@/hooks/useHint.ts'
 import Box from '@/components/Box.tsx'
+import { GameState } from '@/types/game.ts'
+import { useSubmission } from '@/hooks/useSubmission.ts'
 
 export default function Room() {
   const navigate = useNavigate()
@@ -26,6 +28,8 @@ export default function Room() {
   const { id } = useParams<{ id: string }>()
   const { client, isConnected } = useStompClient()
   const [ready, setReady] = useState(false)
+  const [answer, setAnswer] = useState('')
+  const [submitted, setSubmitted] = useState(false)
 
   const playerId = Number(sessionStorage.getItem('playerId'))
   const roomId = useMemo<number | null>(() => {
@@ -38,6 +42,7 @@ export default function Room() {
   const { countdown } = useCountdown(roomId ?? 0)
   const { gameState } = useGameState(roomId ?? 0)
   const { hintData } = useHint(roomId ?? 0)
+  const { submissions } = useSubmission(roomId ?? 0)
 
   const isCreator = useMemo(() => {
     return room?.creator?.id === playerId
@@ -90,7 +95,20 @@ export default function Room() {
     if (!client || !client.active) return
 
     client.publish({
-      destination: `/pub/rooms/${roomId}/start`,
+      destination: `/pub/rooms/${roomId}/game/start`,
+    })
+  }
+
+  const submitAnswer = () => {
+    setSubmitted(true)
+    const body = JSON.stringify({
+      playerId: playerId,
+      quizId: hintData?.quizId,
+      answer: answer,
+    })
+    client?.publish({
+      destination: `/pub/rooms/${roomId}/submit`,
+      body: body,
     })
   }
 
@@ -102,6 +120,13 @@ export default function Room() {
       body: JSON.stringify({ roomId, playerId }),
     })
   }, [client, roomId, playerId])
+
+  useEffect(() => {
+    if (gameState === GameState.HINT) {
+      setSubmitted(false)
+      setAnswer('')
+    }
+  }, [gameState])
 
   if (roomId === null || playerId === null || isNotFound) {
     return <NotFound />
@@ -165,7 +190,16 @@ export default function Room() {
           <div className="w-full flex justify-center items-center my-10">
             <InputOTP
               maxLength={hintData?.answerLength ? hintData.answerLength : 5}
-              disabled={!room?.playing}
+              disabled={!(gameState === GameState.HINT && !submitted)}
+              value={answer}
+              onChange={setAnswer}
+              onKeyDownCapture={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  submitAnswer()
+                }
+              }}
             >
               <InputOTPGroup>
                 {Array.from({
@@ -187,9 +221,12 @@ export default function Room() {
             >
               <PlayerProfile
                 player={player}
-                creatorId={room?.creator?.id}
+                creatorId={room?.creator?.id as number}
                 playerId={playerId}
-                romeState={room?.playing}
+                roomState={room?.playing}
+                submission={submissions?.find(
+                  (submission) => submission.playerId === player.id,
+                )}
               />
             </div>
           ))}
