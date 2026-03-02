@@ -20,6 +20,7 @@ import { useHint } from '@/hooks/useHint.ts'
 import Box from '@/components/Box.tsx'
 import { GameState } from '@/types/game.ts'
 import { useSubmission } from '@/hooks/useSubmission.ts'
+import { useAnswer } from '@/hooks/useAnswer.ts'
 
 export default function Room() {
   const navigate = useNavigate()
@@ -28,7 +29,7 @@ export default function Room() {
   const { id } = useParams<{ id: string }>()
   const { client, isConnected } = useStompClient()
   const [ready, setReady] = useState(false)
-  const [answer, setAnswer] = useState('')
+  const [userAnswer, setUserAnswer] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
   const playerId = Number(sessionStorage.getItem('playerId'))
@@ -43,6 +44,7 @@ export default function Room() {
   const { gameState } = useGameState(roomId ?? 0)
   const { hintData } = useHint(roomId ?? 0)
   const { submissions } = useSubmission(roomId ?? 0)
+  const { answer } = useAnswer(roomId ?? 0)
 
   const isCreator = useMemo(() => {
     return room?.creator?.id === playerId
@@ -104,7 +106,7 @@ export default function Room() {
     const body = JSON.stringify({
       playerId: playerId,
       quizId: hintData?.quizId,
-      answer: answer,
+      answer: userAnswer,
     })
     client?.publish({
       destination: `/pub/rooms/${roomId}/submit`,
@@ -124,7 +126,7 @@ export default function Room() {
   useEffect(() => {
     if (gameState === GameState.HINT) {
       setSubmitted(false)
-      setAnswer('')
+      setUserAnswer('')
     }
   }, [gameState])
 
@@ -191,8 +193,8 @@ export default function Room() {
             <InputOTP
               maxLength={hintData?.answerLength ? hintData.answerLength : 5}
               disabled={!(gameState === GameState.HINT && !submitted)}
-              value={answer}
-              onChange={setAnswer}
+              value={userAnswer}
+              onChange={setUserAnswer}
               onKeyDownCapture={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
