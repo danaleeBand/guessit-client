@@ -251,6 +251,10 @@ export default function Room() {
                 submission={submissions?.find(
                   (submission) => submission.playerId === player.id,
                 )}
+                result={answer?.results.find(
+                  (result) => result.playerId === player.id,
+                )}
+                gameState={gameState}
               />
             </div>
           ))}

@@ -1,16 +1,13 @@
-import { Label } from '@/components/ui/label.tsx'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx'
-import { Crown } from 'lucide-react'
-import { Player } from '@/types/player.ts'
-import { Badge } from '@/components/ui/badge.tsx'
-import { Submission } from '@/types/submission.ts'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip.tsx'
-import { TooltipArrow } from '@radix-ui/react-tooltip'
+import {Label} from '@/components/ui/label.tsx'
+import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar.tsx'
+import {Crown} from 'lucide-react'
+import {Player} from '@/types/player.ts'
+import {Badge} from '@/components/ui/badge.tsx'
+import {Submission} from '@/types/submission.ts'
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from '@/components/ui/tooltip.tsx'
+import {TooltipArrow} from '@radix-ui/react-tooltip'
+import {Result} from '@/types/result.ts'
+import {GameState} from '@/types/game.ts'
 
 interface PlayerProps {
   player: Player
@@ -18,6 +15,8 @@ interface PlayerProps {
   playerId: number
   roomState: boolean | undefined
   submission: Submission | null | undefined
+  result: Result | null | undefined
+  gameState: GameState | undefined
 }
 
 const PlayerProfile = ({
@@ -26,6 +25,8 @@ const PlayerProfile = ({
   playerId,
   roomState,
   submission,
+  result,
+  gameState,
 }: PlayerProps) => {
   const isMe = player.id === playerId
 
@@ -44,13 +45,22 @@ const PlayerProfile = ({
   return (
     <div className="flex flex-col items-center space-y-1">
       <TooltipProvider>
-        <Tooltip open={false}>
+        <Tooltip open={gameState === GameState.SCORING}>
           <TooltipTrigger asChild>
             <div className="w-1 h-1" />
           </TooltipTrigger>
-          <TooltipContent side="top">
-            {'해리포터'}
-            <TooltipArrow />
+          <TooltipContent
+            side="top"
+            className={
+              result?.isCorrect
+                ? 'bg-blue-500 text-white font-semibold'
+                : 'bg-red-500 text-white font-semibold'
+            }
+          >
+            {result?.submittedAnswer}
+            <TooltipArrow
+              className={result?.isCorrect ? 'fill-blue-500' : 'fill-red-500'}
+            />
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
