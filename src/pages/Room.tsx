@@ -44,7 +44,28 @@ export default function Room() {
   const { gameState } = useGameState(roomId ?? 0)
   const { hintData } = useHint(roomId ?? 0)
   const { submissions } = useSubmission(roomId ?? 0)
-  const { answer } = useAnswer(roomId ?? 0)
+  // const { answer } = useAnswer(roomId ?? 0)
+  const [answer, setAnswer] = useState({
+    quizOrder: 1,
+    quizId: 13,
+    results: [
+      {
+        playerId: 34,
+        isCorrect: true,
+        submittedAnswer: '백설공주',
+        rank: 1,
+        score: 5,
+      },
+      {
+        playerId: 33,
+        isCorrect: false,
+        submittedAnswer: '신데렐라',
+        rank: 2,
+        score: 5,
+      },
+    ],
+    answer: '백설공주',
+  })
 
   const isCreator = useMemo(() => {
     return room?.creator?.id === playerId
@@ -186,6 +207,7 @@ export default function Room() {
               gameState={gameState}
               hints={hintData?.hints}
               romeState={room?.playing}
+              answer={answer?.answer}
             />
           </div>
           게임 상태 : {gameState}

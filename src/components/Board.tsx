@@ -1,6 +1,12 @@
 import { Button } from '@/components/ui/button'
 import { GameState } from '@/types/game.ts'
 import Box from '@/components/Box.tsx'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card.tsx'
 
 interface BoardProps {
   countdown: number | undefined
@@ -12,6 +18,7 @@ interface BoardProps {
   gameState: GameState | undefined
   hints: string[] | undefined
   romeState: boolean | undefined
+  answer: string | undefined
 }
 
 const Board = ({
@@ -24,6 +31,7 @@ const Board = ({
   gameState,
   hints,
   romeState,
+  answer,
 }: BoardProps) => {
   return (
     <Box className="min-h-[300px] w-full rounded-lg mx-auto overflow-hidden shadow-none">
@@ -72,6 +80,18 @@ const Board = ({
                 <div className="text-base font-medium">{hint}</div>
               </Box>
             ))}
+          </div>
+        )}
+        {gameState === GameState.SCORING && hints && (
+          <div>
+            <Card className="w-56">
+              <CardHeader className="bg-gray-100 border-b h-10 items-center justify-center">
+                <CardTitle className="text-sm font-semibold">정답</CardTitle>
+              </CardHeader>
+              <CardContent className="flex items-center justify-center p-4">
+                <div className="text-lg font-bold">{answer}</div>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>
