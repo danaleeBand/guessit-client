@@ -21,6 +21,7 @@ import Box from '@/components/Box.tsx'
 import { GameState } from '@/types/game.ts'
 import { useSubmission } from '@/hooks/useSubmission.ts'
 import { useAnswer } from '@/hooks/useAnswer.ts'
+import { useScores } from '@/hooks/useScores.ts'
 
 export default function Room() {
   const navigate = useNavigate()
@@ -66,6 +67,20 @@ export default function Room() {
     ],
     answer: '백설공주',
   })
+
+  // const { scores } = useScores(roomId ?? 0)
+  const [scores, setScores] = useState([
+    {
+      playerId: 33,
+      score: 15,
+      rank: 1,
+    },
+    {
+      playerId: 34,
+      score: 13,
+      rank: 2,
+    },
+  ])
 
   const isCreator = useMemo(() => {
     return room?.creator?.id === playerId
@@ -255,6 +270,7 @@ export default function Room() {
                   (result) => result.playerId === player.id,
                 )}
                 gameState={gameState}
+                score={scores?.find((score) => score.playerId === player.id)}
               />
             </div>
           ))}

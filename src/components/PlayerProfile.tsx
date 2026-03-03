@@ -1,13 +1,19 @@
-import {Label} from '@/components/ui/label.tsx'
-import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar.tsx'
-import {Crown} from 'lucide-react'
-import {Player} from '@/types/player.ts'
-import {Badge} from '@/components/ui/badge.tsx'
-import {Submission} from '@/types/submission.ts'
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from '@/components/ui/tooltip.tsx'
-import {TooltipArrow} from '@radix-ui/react-tooltip'
-import {Result} from '@/types/result.ts'
-import {GameState} from '@/types/game.ts'
+import { Label } from '@/components/ui/label.tsx'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx'
+import { Crown } from 'lucide-react'
+import { Player } from '@/types/player.ts'
+import { Badge } from '@/components/ui/badge.tsx'
+import { Submission } from '@/types/submission.ts'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip.tsx'
+import { TooltipArrow } from '@radix-ui/react-tooltip'
+import { Result } from '@/types/result.ts'
+import { GameState } from '@/types/game.ts'
+import { Score } from '@/types/score.ts'
 
 interface PlayerProps {
   player: Player
@@ -17,6 +23,7 @@ interface PlayerProps {
   submission: Submission | null | undefined
   result: Result | null | undefined
   gameState: GameState | undefined
+  score: Score | undefined
 }
 
 const PlayerProfile = ({
@@ -27,6 +34,7 @@ const PlayerProfile = ({
   submission,
   result,
   gameState,
+  score,
 }: PlayerProps) => {
   const isMe = player.id === playerId
 
@@ -42,6 +50,10 @@ const PlayerProfile = ({
         return `${rank}th`
     }
   }
+
+  const rank =
+    gameState === GameState.SCORING ? result?.rank : submission?.submitOrder
+
   return (
     <div className="flex flex-col items-center space-y-1">
       <TooltipProvider>
@@ -73,9 +85,7 @@ const PlayerProfile = ({
               {player.ready ? 'Ready!' : ''}
             </Label>
           ))}
-        {submission != null && submission.playerId === player.id && (
-          <Badge variant="secondary">{rankEmoji(submission.submitOrder)}</Badge>
-        )}
+        {rank != null && <Badge variant="secondary">{rankEmoji(rank)}</Badge>}
       </div>
       <Avatar
         className={`text-black w-12 h-12 ${isMe ? 'border-2 border-dashed border-black bg-transparent' : 'bg-gray-200'}`}
@@ -85,7 +95,7 @@ const PlayerProfile = ({
       </Avatar>
       <div className="text-sm">{player.nickname}</div>
       <Badge variant="outline" className="text-xs w-12 justify-center">
-        {player.score || '-'}
+        {score?.score || '-'}
       </Badge>
     </div>
   )
