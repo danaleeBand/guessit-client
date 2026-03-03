@@ -64,14 +64,14 @@ const PlayerProfile = ({
           <TooltipContent
             side="top"
             className={
-              result?.isCorrect
+              result?.correct
                 ? 'bg-blue-500 text-white font-semibold'
                 : 'bg-red-500 text-white font-semibold'
             }
           >
             {result?.submittedAnswer}
             <TooltipArrow
-              className={result?.isCorrect ? 'fill-blue-500' : 'fill-red-500'}
+              className={result?.correct ? 'fill-blue-500' : 'fill-red-500'}
             />
           </TooltipContent>
         </Tooltip>
@@ -87,6 +87,9 @@ const PlayerProfile = ({
           ))}
         {rank != null && <Badge variant="secondary">{rankEmoji(rank)}</Badge>}
       </div>
+      <Label className="items-center">
+        {result?.score > 0 ? `+ ${result?.score}` : '❌'}
+      </Label>
       <Avatar
         className={`text-black w-12 h-12 ${isMe ? 'border-2 border-dashed border-black bg-transparent' : 'bg-gray-200'}`}
       >
@@ -95,7 +98,7 @@ const PlayerProfile = ({
       </Avatar>
       <div className="text-sm">{player.nickname}</div>
       <Badge variant="outline" className="text-xs w-12 justify-center">
-        {score?.score || '-'}
+        {score?.score ?? '-'}
       </Badge>
     </div>
   )

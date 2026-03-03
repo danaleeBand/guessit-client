@@ -10,7 +10,7 @@ export const useAnswer = (roomId: number): { answer: Answer | undefined } => {
     if (!client || !isConnected) return
 
     const subscription = client.subscribe(
-      `/sub/rooms/${roomId}/answer`,
+      `/sub/rooms/${roomId}/game/answer`,
       (message) => {
         try {
           const body = JSON.parse(message.body)

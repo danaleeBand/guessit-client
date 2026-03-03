@@ -10,11 +10,12 @@ export const useScores = (roomId: number): { scores: Score[] } => {
     if (!client || !isConnected) return
 
     const subscription = client.subscribe(
-      `/sub/rooms/${roomId}/scores`,
+      `/sub/rooms/${roomId}/game/scores`,
       (message) => {
         try {
           const body = JSON.parse(message.body)
           setScores(body)
+          console.log(body)
         } catch (err) {
           console.error('Failed to get Scores:', err)
         }

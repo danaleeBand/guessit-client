@@ -1,6 +1,6 @@
 export interface Result {
   playerId: number
-  isCorrect: boolean
+  correct: boolean
   submittedAnswer: string
   rank: number
   score: number

@@ -12,7 +12,7 @@ export const useSubmission = (
     if (!client || !isConnected) return
 
     const subscription = client.subscribe(
-      `/sub/rooms/${roomId}/submissions`,
+      `/sub/rooms/${roomId}/game/submissions`,
       (message) => {
         try {
           const body = JSON.parse(message.body)

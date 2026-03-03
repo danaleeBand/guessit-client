@@ -45,42 +45,8 @@ export default function Room() {
   const { gameState } = useGameState(roomId ?? 0)
   const { hintData } = useHint(roomId ?? 0)
   const { submissions } = useSubmission(roomId ?? 0)
-  // const { answer } = useAnswer(roomId ?? 0)
-  const [answer, setAnswer] = useState({
-    quizOrder: 1,
-    quizId: 13,
-    results: [
-      {
-        playerId: 34,
-        isCorrect: true,
-        submittedAnswer: '백설공주',
-        rank: 1,
-        score: 5,
-      },
-      {
-        playerId: 33,
-        isCorrect: false,
-        submittedAnswer: '신데렐라',
-        rank: 2,
-        score: 5,
-      },
-    ],
-    answer: '백설공주',
-  })
-
-  // const { scores } = useScores(roomId ?? 0)
-  const [scores, setScores] = useState([
-    {
-      playerId: 33,
-      score: 15,
-      rank: 1,
-    },
-    {
-      playerId: 34,
-      score: 13,
-      rank: 2,
-    },
-  ])
+  const { answer } = useAnswer(roomId ?? 0)
+  const { scores } = useScores(roomId ?? 0)
 
   const isCreator = useMemo(() => {
     return room?.creator?.id === playerId
@@ -145,7 +111,7 @@ export default function Room() {
       answer: userAnswer,
     })
     client?.publish({
-      destination: `/pub/rooms/${roomId}/submit`,
+      destination: `/pub/rooms/${roomId}/game/submit`,
       body: body,
     })
   }
