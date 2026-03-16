@@ -22,6 +22,7 @@ import { GameState } from '@/types/game.ts'
 import { useSubmission } from '@/hooks/useSubmission.ts'
 import { useAnswer } from '@/hooks/useAnswer.ts'
 import { useScores } from '@/hooks/useScores.ts'
+import { ScoreBoardModal } from '@/components/ScoreBoardModal.tsx'
 
 export default function Room() {
   const navigate = useNavigate()
@@ -32,6 +33,7 @@ export default function Room() {
   const [ready, setReady] = useState(false)
   const [userAnswer, setUserAnswer] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [isScoreBoardOpen, setIsScoreBoardOpen] = useState(false)
 
   const playerId = Number(sessionStorage.getItem('playerId'))
   const roomId = useMemo<number | null>(() => {
@@ -130,6 +132,8 @@ export default function Room() {
       setSubmitted(false)
       setUserAnswer('')
     }
+
+    setIsScoreBoardOpen(gameState === GameState.FINISHED)
   }, [gameState])
 
   if (roomId === null || playerId === null || isNotFound) {
@@ -138,6 +142,12 @@ export default function Room() {
 
   return (
     <div>
+      <ScoreBoardModal
+        isOpen={isScoreBoardOpen}
+        onClose={() => setIsScoreBoardOpen(false)}
+        scores={scores ?? []}
+        players={room?.players ?? []}
+      />
       <div className="mt-5 flex flex-col items-center text-center">
         <div className="w-full max-w-[600px] px-4 sm:px-6 lg:px-8  mx-auto">
           <div className="flex w-full flex-row justify-between items-center mb-5">
