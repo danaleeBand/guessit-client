@@ -79,7 +79,7 @@ const PlayerProfile = ({
       <div className="h-5 w-16 flex items-center justify-center">
         {!roomState &&
           (creatorId === player.id ? (
-            <Crown className="size-5" />
+            <Crown className="size-5"/>
           ) : (
             <Label className="items-center">
               {player.ready ? 'Ready!' : ''}
@@ -87,7 +87,9 @@ const PlayerProfile = ({
           ))}
         {rank != null && <Badge variant="secondary">{rankEmoji(rank)}</Badge>}
       </div>
-      <Label className="items-center">
+      <Label
+        className={`items-center ${gameState === GameState.SCORING ? '' : 'invisible'}`}
+      >
         {result?.score > 0 ? `+ ${result?.score}` : '❌'}
       </Label>
       <Avatar
