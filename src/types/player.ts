@@ -7,8 +7,6 @@ export interface Player {
 }
 
 export interface PlayerRequestDto {
-  id: number
   nickname: string
   profileUrl: string
-  ready: boolean
 }

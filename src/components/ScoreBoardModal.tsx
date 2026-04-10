@@ -26,7 +26,12 @@ type ScoreBoardModal = {
   scores: Score[]
   players: Player[]
 }
-export function ScoreBoardModal({ isOpen, onClose, scores, players }) {
+export function ScoreBoardModal({
+  isOpen,
+  onClose,
+  scores,
+  players,
+}: ScoreBoardModal) {
   const rankEmoji = (rank: number | undefined) => {
     switch (rank) {
       case 1:
