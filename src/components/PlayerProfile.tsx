@@ -52,12 +52,20 @@ const PlayerProfile = ({
   }
 
   const rank =
-    gameState === GameState.SCORING ? result?.rank : submission?.submitOrder
+    gameState === GameState.SCORING
+      ? result?.rank
+      : gameState === GameState.HINT
+        ? submission?.submitOrder
+        : null
 
   return (
     <div className="flex flex-col items-center space-y-1">
       <TooltipProvider>
-        <Tooltip open={gameState === GameState.SCORING}>
+        <Tooltip
+          open={
+            gameState === GameState.SCORING && result?.submittedAnswer != null
+          }
+        >
           <TooltipTrigger asChild>
             <div className="w-1 h-1" />
           </TooltipTrigger>
@@ -85,9 +93,13 @@ const PlayerProfile = ({
               {player.ready ? 'Ready!' : ''}
             </Label>
           ))}
-        {rank != null && <Badge variant="secondary">{rankEmoji(rank)}</Badge>}
+        {rank != null && rank > 0 && (
+          <Badge variant="secondary">{rankEmoji(rank)}</Badge>
+        )}
       </div>
-      <Label className="items-center">
+      <Label
+        className={`items-center ${gameState === GameState.SCORING ? '' : 'invisible'}`}
+      >
         {result?.score > 0 ? `+ ${result?.score}` : '❌'}
       </Label>
       <Avatar
