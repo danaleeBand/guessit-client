@@ -100,7 +100,7 @@ const PlayerProfile = ({
       <Label
         className={`items-center ${gameState === GameState.SCORING ? '' : 'invisible'}`}
       >
-        {result?.score > 0 ? `+ ${result?.score}` : '❌'}
+        {result?.correct ? `+ ${result?.score ?? 0} ` : '❌'}
       </Label>
       <Avatar
         className={`text-black w-12 h-12 ${isMe ? 'border-2 border-dashed border-black bg-transparent' : 'bg-gray-200'}`}
