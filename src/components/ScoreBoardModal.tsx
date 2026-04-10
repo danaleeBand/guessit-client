@@ -49,7 +49,7 @@ export function ScoreBoardModal({ isOpen, onClose, scores, players }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Rank</TableHead>
+              <TableHead className="text-center">Rank</TableHead>
               <TableHead>User</TableHead>
               <TableHead></TableHead>
               <TableHead className="text-right">Score</TableHead>
@@ -61,8 +61,14 @@ export function ScoreBoardModal({ isOpen, onClose, scores, players }) {
               if (!player) return null
               return (
                 <TableRow key={score.playerId}>
-                  <TableCell className="font-medium">
-                    <Label className="text-3xl">{rankEmoji(score.rank)}</Label>
+                  <TableCell className="font-medium text-center">
+                    {score.rank < 4 ? (
+                      <Label className="text-3xl">
+                        {rankEmoji(score.rank)}
+                      </Label>
+                    ) : (
+                      <Label className="text-lg">{score.rank}</Label>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Avatar className="w-8 h-8">
