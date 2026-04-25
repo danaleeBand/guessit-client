@@ -181,7 +181,7 @@ export default function Room() {
           </div>
           <div className="w-full">
             <div className="flex justify-end mb-3">
-              <Box className="px-3 py-1 w-20 text-center text-lg font-bold">
+              <Box className="px-3 py-1 w-25 text-center text-lg font-bold">
                 {room?.playing && hintData?.quizOrder
                   ? `${hintData?.quizOrder} / 10`
                   : '...'}

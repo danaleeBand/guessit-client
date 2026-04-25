@@ -60,8 +60,8 @@ export default function Start() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-8">
-      <Card className="w-full max-w-sm sm:max-w-md p-6 shadow-xl">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8">
+      <Card className="w-full max-w-sm p-6 shadow-xl">
         <CardContent className="space-y-4">
           <h1 className="py-6 text-3xl font-bold text-center">Guessit!</h1>
 

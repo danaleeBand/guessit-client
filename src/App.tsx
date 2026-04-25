@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom'
 import Start from './pages/Start.tsx'
 import Room from './pages/Room.tsx'
-import { Toaster } from '@/components/ui/toaster.tsx'
+import MobileLayout from './layouts/MobileLayout.tsx'
 
 const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
   const isAuthenticated = sessionStorage.getItem('playerId')
@@ -19,15 +19,16 @@ const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
 function App() {
   return (
     <Router>
-      <Toaster />
       <Routes>
-        <Route path="/input-nickname" element={<Start />} />
-        <Route path="/" element={<ProtectedRoute element={<Home />} />} />
-        <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
-        <Route
-          path="/room/:id"
-          element={<ProtectedRoute element={<Room />} />}
-        />
+        <Route element={<MobileLayout />}>
+          <Route path="/input-nickname" element={<Start />} />
+          <Route path="/" element={<ProtectedRoute element={<Home />} />} />
+          <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
+          <Route
+            path="/room/:id"
+            element={<ProtectedRoute element={<Room />} />}
+          />
+        </Route>
       </Routes>
     </Router>
   )
