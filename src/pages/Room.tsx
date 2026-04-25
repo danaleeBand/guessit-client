@@ -203,8 +203,7 @@ export default function Room() {
               answer={answer?.answer}
             />
           </div>
-          게임 상태 : {gameState}
-          <div className="w-full flex justify-center items-center my-10">
+          <div className="w-full flex justify-center items-center my-4">
             <InputOTP
               maxLength={hintData?.answerLength ? hintData.answerLength : 5}
               disabled={!(gameState === GameState.HINT && !submitted)}
