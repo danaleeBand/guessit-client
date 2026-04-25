@@ -4,7 +4,6 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '../components/ui/input-otp'
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp'
 import { Separator } from '../components/ui/separator'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button.tsx'
@@ -24,6 +23,8 @@ import { useSubmission } from '@/hooks/useSubmission.ts'
 import { useAnswer } from '@/hooks/useAnswer.ts'
 import { useScores } from '@/hooks/useScores.ts'
 import { ScoreBoardModal } from '@/components/ScoreBoardModal.tsx'
+
+const REGEXP_ALPHANUMERIC_KOREAN = '^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ]*$'
 
 export default function Room() {
   const navigate = useNavigate()
@@ -210,7 +211,7 @@ export default function Room() {
               value={userAnswer}
               onChange={setUserAnswer}
               inputMode="text"
-              pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+              pattern={REGEXP_ALPHANUMERIC_KOREAN}
               onKeyDownCapture={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
