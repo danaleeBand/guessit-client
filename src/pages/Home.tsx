@@ -61,12 +61,12 @@ export default function Home() {
       </div>
       <CreateRoomModal />
 
-      <div className="mt-10 flex flex-col items-center text-center">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="mt-10 px-4">
+        <div className="grid grid-cols-1 gap-4">
           {roomList.map((value) => (
             <Card
               key={value.id}
-              className={`w-[320px] ${value.playing ? 'opacity-50 pointer-events-none' : 'hover:shadow-lg'}`}
+              className={`w-full ${value.playing ? 'opacity-50 pointer-events-none' : 'hover:shadow-lg'}`}
             >
               <CardHeader className="text-left">
                 <CardTitle>
