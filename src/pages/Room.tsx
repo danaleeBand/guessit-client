@@ -4,6 +4,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '../components/ui/input-otp'
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp'
 import { Separator } from '../components/ui/separator'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button.tsx'
@@ -208,6 +209,8 @@ export default function Room() {
               disabled={!(gameState === GameState.HINT && !submitted)}
               value={userAnswer}
               onChange={setUserAnswer}
+              inputMode="text"
+              pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
               onKeyDownCapture={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
