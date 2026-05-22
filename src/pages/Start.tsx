@@ -60,6 +60,7 @@ export default function Start() {
       .catch((err) => {
         console.error(err)
         toast({
+          variant: 'destructive',
           title: '서버 오류로 인해 프로필 생성에 실패했습니다.',
         })
       })
