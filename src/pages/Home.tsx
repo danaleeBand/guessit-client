@@ -1,7 +1,7 @@
 import { IoMdLock } from 'react-icons/io'
 import { Button } from '../components/ui/button.tsx'
 import { useState } from 'react'
-import { Dialog, DialogContent } from '@/components/ui/dialog.tsx'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog.tsx'
 import { Spinner } from '@/components/ui/spinner.tsx'
 import CreateRoomModal from '@/components/CreateRoomModal.tsx'
 import { useNavigate } from 'react-router-dom'
@@ -61,6 +61,7 @@ export default function Home() {
   return (
     <>
       <Dialog open={isJoining}>
+        <DialogTitle></DialogTitle>
         <DialogContent
           className="sm:max-w-xs flex flex-col items-center gap-4 py-8 [&>button]:hidden"
           onInteractOutside={(e) => e.preventDefault()}

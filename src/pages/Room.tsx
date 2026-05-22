@@ -140,6 +140,7 @@ export default function Room() {
     return () => {
       window.removeEventListener('beforeunload', onBeforeUnload)
       window.removeEventListener('popstate', onPopState)
+      handleLeaveRef.current()
     }
   }, [])
 
