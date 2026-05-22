@@ -62,6 +62,7 @@ export default function CreateRoomModal() {
     } catch (err) {
       console.log(err)
       toast({
+        variant: 'destructive',
         title: '서버 오류로 인해 방 생성에 실패했습니다.',
       })
     }
