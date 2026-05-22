@@ -47,6 +47,7 @@ export default function CreateRoomModal() {
   const onCreateRoomButton = async () => {
     if (!room.title.trim()) {
       toast({
+        variant: 'destructive',
         title: '방 제목을 입력해주세요!',
       })
       return

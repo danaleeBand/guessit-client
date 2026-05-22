@@ -46,6 +46,7 @@ export default function Start() {
     e.preventDefault()
     if (!player.nickname) {
       toast({
+        variant: 'destructive',
         title: '닉네임을 입력해주세요!',
       })
       return
