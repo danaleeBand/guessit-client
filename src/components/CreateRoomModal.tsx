@@ -75,6 +75,7 @@ export default function CreateRoomModal() {
   return (
     <>
       <Dialog open={isLoading}>
+        <DialogTitle></DialogTitle>
         <DialogContent
           className="sm:max-w-xs flex flex-col items-center gap-4 py-8 [&>button]:hidden"
           onInteractOutside={(e) => e.preventDefault()}

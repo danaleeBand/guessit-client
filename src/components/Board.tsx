@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card.tsx'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
 
 interface BoardProps {
@@ -47,11 +47,13 @@ const Board = ({
   const handleStartGame = () => {
     setIsStarting(true)
     onStartGame()
+    setTimeout(() => setIsStarting(false), 10000)
   }
 
   return (
     <>
       <Dialog open={isStarting}>
+        <DialogTitle></DialogTitle>
         <DialogContent
           className="sm:max-w-xs flex flex-col items-center gap-4 py-8 [&>button]:hidden"
           onInteractOutside={(e) => e.preventDefault()}
