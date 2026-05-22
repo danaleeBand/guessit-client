@@ -91,6 +91,9 @@ export default function Room() {
     })
   }
 
+  const handleLeaveRef = useRef(handleLeave)
+  handleLeaveRef.current = handleLeave
+
   const handleLeaveAndGoHome = () => {
     handleLeave()
     setTimeout(() => {
@@ -128,6 +131,17 @@ export default function Room() {
       body: JSON.stringify({ roomId, playerId }),
     })
   }, [client, roomId, playerId])
+
+  useEffect(() => {
+    const onBeforeUnload = () => handleLeaveRef.current()
+    const onPopState = () => handleLeaveRef.current()
+    window.addEventListener('beforeunload', onBeforeUnload)
+    window.addEventListener('popstate', onPopState)
+    return () => {
+      window.removeEventListener('beforeunload', onBeforeUnload)
+      window.removeEventListener('popstate', onPopState)
+    }
+  }, [])
 
   useEffect(() => {
     if (gameState === GameState.HINT) {
