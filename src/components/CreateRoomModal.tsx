@@ -15,6 +15,7 @@ import { Button } from './ui/button.tsx'
 import { BsDoorOpenFill } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
 import roomApi from '../apis/roomApi.ts'
+import { toast } from '@/hooks/use-toast.ts'
 
 export default function CreateRoomModal() {
   const playerId = Number(sessionStorage.getItem('playerId'))
@@ -45,7 +46,10 @@ export default function CreateRoomModal() {
 
   const onCreateRoomButton = async () => {
     if (!room.title.trim()) {
-      alert('방 제목을 입력해주세요!')
+      toast({
+        variant: 'destructive',
+        title: '방 제목을 입력해주세요!',
+      })
       return
     }
 
@@ -58,7 +62,10 @@ export default function CreateRoomModal() {
       navigate(`/room/${roomId}`)
     } catch (err) {
       console.log(err)
-      alert('서버 오류로 인해 방 생성에 실패했습니다.')
+      toast({
+        variant: 'destructive',
+        title: '서버 오류로 인해 방 생성에 실패했습니다.',
+      })
     }
   }
 

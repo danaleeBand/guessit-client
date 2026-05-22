@@ -9,6 +9,7 @@ import {
   AvatarImage,
 } from '../components/ui/avatar.tsx'
 import playerApi from '../apis/playerApi.ts'
+import { toast } from '@/hooks/use-toast.ts'
 
 const profileImages = [
   'https://i.postimg.cc/J76717dq/2025-02-07-9-11-10.png',
@@ -44,7 +45,10 @@ export default function Start() {
   const handleClick = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!player.nickname) {
-      alert('닉네임을 입력해주세요!')
+      toast({
+        variant: 'destructive',
+        title: '닉네임을 입력해주세요!',
+      })
       return
     }
     await playerApi
@@ -55,7 +59,10 @@ export default function Start() {
       })
       .catch((err) => {
         console.error(err)
-        alert('서버 오류로 인해 프로필 생성에 실패했습니다.')
+        toast({
+          variant: 'destructive',
+          title: '서버 오류로 인해 프로필 생성에 실패했습니다.',
+        })
       })
   }
 
@@ -79,6 +86,7 @@ export default function Start() {
               placeholder="닉네임을 입력해주세요"
               value={player.nickname}
               onChange={handleNicknameChange}
+              maxLength={6}
               className="w-full"
             />
           </div>
