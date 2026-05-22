@@ -1,6 +1,8 @@
 import { IoMdLock } from 'react-icons/io'
 import { Button } from '../components/ui/button.tsx'
 import { useState } from 'react'
+import { Dialog, DialogContent } from '@/components/ui/dialog.tsx'
+import { Spinner } from '@/components/ui/spinner.tsx'
 import CreateRoomModal from '@/components/CreateRoomModal.tsx'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -22,6 +24,7 @@ export default function Home() {
   const roomList = useRoomList()
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
+  const [isJoining, setIsJoining] = useState(false)
 
   const navigate = useNavigate()
 
@@ -32,6 +35,7 @@ export default function Home() {
       setSelectedRoom(room)
       setIsPasswordModalOpen(true)
     } else {
+      setIsJoining(true)
       try {
         const res = await roomApi.joinRoom(room.id, { playerId, password: '' })
 
@@ -40,9 +44,8 @@ export default function Home() {
         if (valid) {
           navigate(`/room/${room.id}`)
         } else {
-          toast({
-            title: message,
-          })
+          toast({ title: message })
+          setIsJoining(false)
         }
       } catch (err) {
         console.error(err)
@@ -50,12 +53,23 @@ export default function Home() {
           variant: 'destructive',
           title: '방 입장 중 오류가 발생했습니다.',
         })
+        setIsJoining(false)
       }
     }
   }
 
   return (
     <>
+      <Dialog open={isJoining}>
+        <DialogContent
+          className="sm:max-w-xs flex flex-col items-center gap-4 py-8 [&>button]:hidden"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <Spinner className="size-8" />
+          <p className="text-sm text-neutral-500">방에 입장하고 있어요...</p>
+        </DialogContent>
+      </Dialog>
       <div className="mt-10 text-center">
         <h1 className="text-3xl font-semibold text-gray-800">Guess It!</h1>
       </div>
@@ -83,7 +97,12 @@ export default function Home() {
                 <span className="bg-gray-100 text-gray-700 font-semibold text-sm px-2 py-1 rounded-md">
                   {value.playerCount} / 5
                 </span>
-                <Button onClick={() => handleJoinClick(value)}>Join</Button>
+                <Button
+                  onClick={() => handleJoinClick(value)}
+                  disabled={isJoining}
+                >
+                  Join
+                </Button>
               </CardFooter>
             </Card>
           ))}
